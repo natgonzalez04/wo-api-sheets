@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <base target="_top">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+    </head>
+    <body>
+
+            <section class="containerCatalogoBase">
+                <section class="optionAll">
+                    <span style="margin-right: 5px;">Seleccionar todos</span>
+                    <label class="switch">
+                        <input type="checkbox" id="addAllCheckbox">
+                        <span class="slider"></span>
+                    </label>
+                </section>
+                <section class="containerCatalogo">
+                    <table id="miTabla" class="tablaData">
+        
+                    </table>
+                    
+                </section>
+                <section class="optionsData">
+                    
+                    <section>
+                        <span class="optionsMore" style="margin-bottom: 5px;"><b>Como quieres importar la información</b></span>
+                        <form id="selectionExitData" style="display: flex; flex-direction: column;">
+                            <div class="optionsMore">
+                                <input type="radio" id="opcion1" name="option" value="listar">
+                                <label for="opcion1">Listar información en celda</label>
+                            </div>
+                            <div class="optionsMore">
+                                <input type="radio" id="opcion2" name="option" value="menu">
+                                <label for="opcion2">Crear menu desplegable</label>
+                            </div>
+                        </form>
+                    </section>
+                    <button type="button" class="buttonImport" onclick="sendDataSelected()">Agregar</button>
+                </section>
+            </section>
+        
+            <script>
+
+                    var tabla = document.getElementById('miTabla');
+                    var optionsExit = document.getElementsByName('option');
+                    var selectOptionSend;
+                    var selecciones = [];
+                    var resulAll = [];
+
+                    google.script.run.withSuccessHandler(function(result) {
+                            
+                        console.log(result,'result');
+                        resulAll = result;
+                        result.forEach(function(elemento) {
+                        var fila = document.createElement('tr');
+                        var celda = document.createElement('td');
+                        celda.textContent = elemento.nombre;
+                        celda.classList.add('celdaTabla');
+                        fila.appendChild(celda);
+                        fila.classList.add('filaTabla');
+                        fila.addEventListener('click', clickCell);
+                        tabla.appendChild(fila);
+                    });
+                    }).getDataMoneda();
+
+                    document.getElementById('addAllCheckbox').addEventListener('change', function(e) {
+                        if (e.target.checked) {
+                            
+                            var dataResult = [...resulAll];
+
+                            selecciones = dataResult.map(function(elemento) {
+                                return elemento.nombre;
+                            });
+                            var cells = document.querySelectorAll('td');
+                            for (var i = 0; i < cells.length; i++) {
+                                cells[i].classList.add('selectedCelda');
+                            }
+
+                            console.log(selecciones,'seleccionesV2');
+                        } else {
+                            selecciones = [];
+                            var cells = document.querySelectorAll('td');
+                            for (var i = 0; i < cells.length; i++) {
+                                cells[i].classList.remove('selectedCelda');
+                            }
+                        }
+
+                        google.script.run.guardarSeleccionMoneda(selecciones);
+                    });
+
+
+                    for(var i = 0; i < optionsExit.length; i++) {
+                        optionsExit[i].addEventListener('change', function() {
+                            console.log(this.value,'this.valueCheck');
+                            selectOptionSend = this.value;
+                            google.script.run.guardarSeleccionOpcionMoneda(selectOptionSend);
+                        });
+                    }
+
+                    function clickCell(evento) {
+                        var seleccion = evento.target.textContent;
+                        if (selecciones.includes(seleccion)) {
+                            selecciones = selecciones.filter(function(elemento) {
+                                return elemento !== seleccion;
+                            });
+                            evento.target.classList.remove('selectedCelda');
+                        } else {
+                            selecciones.push(seleccion);
+                            evento.target.classList.add('selectedCelda');
+                        }
+                        console.log(selecciones);
+                        google.script.run.guardarSeleccionMoneda(selecciones);
+                    }
+
+                    function sendDataSelected() {
+                        console.log(selecciones,'selecciones');
+                        google.script.run.mostrarDatosCeldaMoneda();
+                        google.script.host.close();
+                    }
+
+            </script>
+    </body>
+</html>

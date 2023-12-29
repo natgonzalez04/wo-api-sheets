@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <base target="_top">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+        <style>
+        *{
+            box-sizing: border-box;
+        }
+        body {
+            padding: 0;
+            margin: 0;
+            font-family: 'Raleway', sans-serif;
+            display: flex;
+            justify-content: center;
+        }
+        .containerLogin{
+            display: flex;
+            padding: 2em;
+            justify-content: center;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .logo{
+            width: 30vw;
+            margin-left: 30%;
+            margin-top: 30px;
+            filter: drop-shadow(0 0 0.75rem #0d95f0);
+        }
+        .tokenLogin{
+            width: 60vw;
+            border: none;
+            border-bottom: 1px solid #2b2b2b;
+            outline: none;
+            color: #313131;
+            background-color: transparent;
+        }
+        #mensajeError{
+            color: #d60303;
+            display: none;
+            font-size: 10px;
+            margin-top: 2px;
+        }
+        label{
+            font-size: 14px;
+        }
+        .buttonLogin {
+            background: linear-gradient(to bottom,#2fa6f4 0,#0d95f0 100%);
+            color: #ffffff;
+            padding: 10px 20px;
+            margin: 30px 0;
+            width: 60vw;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .buttonLogin:hover {
+            box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+        }
+        .btn-reset{
+            border: none;
+            background-color: #ffffff;
+            color: #000749;
+            font-size: 20px;
+            cursor: pointer;
+            outline: none;
+            right: 15px;
+            bottom: 1px;
+            font-size: 14px;
+            position: relative;
+            color: #0d95f0;
+            font-family:'Raleway';
+        }       
+        </style>
+    </head>
+    <body>
+        <section class="containerLogin">
+
+            <img class="logo" src="https://www.worldoffice.cloud/assets/images/logoLogin.png" alt="World Office Cloud logo">
+
+            <form id="apiConfigForm" autocomplete="off" class="containerLogin" style="margin-left: 10px;">
+                
+                <label for="token">Ingresa tu token</label>
+                <div style="display: inline-flex;">
+                    <input class="tokenLogin" type="text" id="token" name="token" value="">
+                    <button type="reset" class="btn-reset">x</button>
+                </div>
+                <span id="mensajeError">Ingresa tu token para acceder</span>
+                <button type="button" class="buttonLogin" onclick="enviarDatosApi()">Iniciar</button>
+            </form>
+        </section>
+
+        <script>
+
+            function enviarDatosApi() {
+                var valorToken = document.getElementById('token').value;
+
+                if (valorToken === '') {
+                    document.getElementById('mensajeError').style.display = 'block';
+                    return false; 
+                }
+                document.getElementById('mensajeError').style.display = 'none';
+                
+                google.script.run.withSuccessHandler(confirmacionToken).guardarClaveAPI(valorToken);
+                setTimeout(function(){ 
+                    google.script.host.close();
+                }, 4000);
+
+                return true; 
+            }
+
+            function confirmacionToken(resultado) {
+                google.script.run.withSuccessHandler(function(res) {
+	
+                if (res == 'true') {
+                    // google.script.run.activarOpciones();    
+                }
+                }).validacionClaveAPI();
+            }
+
+        </script>
+    </body>
+</html>
