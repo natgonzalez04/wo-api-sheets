@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <base target="_top">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+    </head>
+    <body>
+
+            <section class="containerCatalogoBase">
+                    <section class="titleCatalogo">
+                        <span>Selecciona uno o mas centros de costos</span>
+                    </section>
+                    
+                    <section class="optionAll">
+                        <span style="margin-right: 5px;">Seleccionar todos</span>
+                        <label class="switch">
+                            <input type="checkbox" id="addAllCheckbox">
+                            <span class="slider"></span>
+                        </label>
+                    </section>
+                    <section class="containerCatalogo">
+                        <table id="miTabla" class="tablaData">
+            
+                        </table>
+                        
+                    </section>
+                    <section class="optionsData">
+                        
+                        <section>
+                            <span class="optionsMore" style="margin-bottom: 5px;"><b>Como quieres importar la información</b></span>
+                            <form id="selectionExitData" style="display: flex; flex-direction: column;">
+                                <div class="optionsMore">
+                                    <input class="radio" type="radio" id="opcion1" name="option" value="listar" checked>
+                                    <label for="opcion1">Listar información en celda</label>
+                                </div>
+                                <div class="optionsMore">
+                                    <input class="radio" type="radio" id="opcion2" name="option" value="menu">
+                                    <label for="opcion2">Crear menu desplegable</label>
+                                </div>
+                            </form>
+                        </section>
+                        <button type="button" class="buttonImport" onclick="sendDataSelected()">Agregar</button>
+                    </section>
+            </section>
+
+            <div id="loading" class="loading">
+                <div class="d-flex justify-content-center align-items-end">
+                        <div class="spinner-grow" style="width: 1rem; height: 1rem" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                        <div class="spinner-grow " style="width: 2rem; height: 2em" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                        <div class="spinner-grow" style="width: 3rem; height: 3rem" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                </div>
+                <p style=" margin-top: 3vh; font-weight: 600; color: #0d95f0;">Cargando datos</p>
+            </div>
+        
+            <script>
+
+                    var tabla = document.getElementById('miTabla');
+                    var optionsExit = document.getElementsByName('option');
+                    var optionChecked = document.querySelector('input[name="option"]:checked');
+                    var contenedorGlobal = document.querySelector('.containerCatalogoBase');
+                    var selectOptionSend;
+                    var selecciones = [];
+                    var resulAll = [];
+
+                    google.script.run.withSuccessHandler(function(result) {
+                            
+                        console.log(result,'result');
+                        resulAll = result;
+                        result.forEach(function(elemento) {
+                        var fila = document.createElement('tr');
+                        var celda = document.createElement('td');
+                        celda.textContent = elemento.nombre;
+                        celda.classList.add('celdaTabla');
+                        fila.appendChild(celda);
+                        fila.classList.add('filaTabla');
+                        fila.addEventListener('click', clickCell);
+                        tabla.appendChild(fila);
+                    });
+                        contenedorGlobal.style.display = 'flex';
+                        document.getElementById('loading').remove();
+                    }).getDataCentroCosto();
+
+
+                    document.getElementById('addAllCheckbox').addEventListener('change', function(e) {
+                        if (e.target.checked) {
+                            
+                            var dataResult = [...resulAll];
+
+                            selecciones = dataResult.map(function(elemento) {
+                                return elemento.nombre;
+                            });
+                            var cells = document.querySelectorAll('td');
+                            for (var i = 0; i < cells.length; i++) {
+                                cells[i].classList.add('selectedCelda');
+                            }
+
+                            console.log(selecciones,'seleccionesV2');
+                        } else {
+                            selecciones = [];
+                            var cells = document.querySelectorAll('td');
+                            for (var i = 0; i < cells.length; i++) {
+                                cells[i].classList.remove('selectedCelda');
+                            }
+                        }
+
+                        google.script.run.guardarSeleccionCentroCosto(selecciones);
+                    });
+
+                    if (optionChecked) {
+                        selectOptionSend = optionChecked.value;
+                        google.script.run.guardarSeleccionOpcionCentroCosto(selectOptionSend);
+                    }
+
+                    for(var i = 0; i < optionsExit.length; i++) {
+                        optionsExit[i].addEventListener('change', function() {
+                            console.log(this.value,'this.valueCheck');
+                            selectOptionSend = this.value;
+                            google.script.run.guardarSeleccionOpcionCentroCosto(selectOptionSend);
+                        });
+                    }
+
+                    function clickCell(evento) {
+                        var seleccion = evento.target.textContent;
+                        if (selecciones.includes(seleccion)) {
+                            selecciones = selecciones.filter(function(elemento) {
+                                return elemento !== seleccion;
+                            });
+                            evento.target.classList.remove('selectedCelda');
+                        } else {
+                            selecciones.push(seleccion);
+                            evento.target.classList.add('selectedCelda');
+                        }
+                        console.log(selecciones);
+                        google.script.run.guardarSeleccionCentroCosto(selecciones);
+                    }
+
+                    function sendDataSelected() {
+                        console.log(selecciones,'seleccionesBtn');
+                        google.script.run.mostrarDatosCeldaCentroCosto();
+                        google.script.host.close();
+                    }
+
+            </script>
+    </body>
+</html>

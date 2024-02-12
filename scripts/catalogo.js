@@ -5,8 +5,8 @@ var ui = SpreadsheetApp.getUi();
 var payload = {
     "columnaOrdenar": "id",
     "pagina": 0,
-    "registrosPorPagina": 10,
-    "orden": "DESC",
+    "registrosPorPagina": 1000,
+    "orden": "ASC",
     "filtros": [],
     "canal": 0,
     "registroInicial": 0
@@ -23,7 +23,7 @@ function listarUnidadesMedida() {
     
     var headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'WO ' + claveAPI,
+        'Authorization': claveAPI,
     };
     
     var options = {
@@ -108,7 +108,7 @@ function listarMonedas(){
     
     var headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'WO ' + claveAPI,
+        'Authorization': claveAPI,
     };
 
     var options = {
@@ -124,7 +124,7 @@ function listarMonedas(){
     if (response.getResponseCode() === 200) {
         var responseData = response.getContentText();
         var jsonData = JSON.parse(responseData);
-        var content = jsonData.content;
+        var content = jsonData.data.content;
         Logger.log(content);
         viewGeneral(selectMoneda);
         var scriptPropertiesMoneda = PropertiesService.getScriptProperties();
@@ -192,11 +192,11 @@ function listarFormasPago(){
 
     var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/formasDePago/listarFormaPago';
+    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/formasDePago/listarFormaPagoDocumento';
     
     var headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'WO ' + claveAPI,
+        'Authorization': claveAPI,
     };
 
     var options = {
@@ -209,10 +209,10 @@ function listarFormasPago(){
     var response = UrlFetchApp.fetch(apiUrl, options);
     Logger.log(response);
 
-    if (response.getResponseCode() === 202) {
+    if (response.getResponseCode() === 200) {
         var responseData = response.getContentText();
         var jsonData = JSON.parse(responseData);
-        var content = jsonData.content;
+        var content = jsonData.data.content;
         Logger.log(content);
         viewGeneral(selectFormaPago);
         var scriptPropertiesFormaPago = PropertiesService.getScriptProperties();
@@ -280,7 +280,7 @@ function listarEmpresas(){
     
     var headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'WO ' + claveAPI,
+        'Authorization': claveAPI,
     };
 
     var options = {
@@ -296,7 +296,7 @@ function listarEmpresas(){
     if (response.getResponseCode() === 200) {
         var responseData = response.getContentText();
         var jsonData = JSON.parse(responseData);
-        var content = jsonData.content;
+        var content = jsonData.data.content;
         Logger.log(content);
         viewGeneral(selectEmpresas);
         var scriptPropertiesEmpresas = PropertiesService.getScriptProperties();
@@ -389,7 +389,7 @@ function listarTiposDocumento(){
     
     var headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'WO ' + claveAPI,
+        'Authorization': claveAPI,
     };
 
     var options = {
@@ -474,7 +474,7 @@ function listarCiudades(){
     
     var headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'WO ' + claveAPI,
+        'Authorization': claveAPI,
     };
 
     var options = {
@@ -486,12 +486,12 @@ function listarCiudades(){
     
     var response = UrlFetchApp.fetch(apiUrl, options);
     Logger.log(response);
-
+    Logger.log(response.getResponseCode());
     if (response.getResponseCode() === 200) {
         var responseData = response.getContentText();
         var jsonData = JSON.parse(responseData);
-        var content = jsonData.content;
-        Logger.log(content);
+        var content = jsonData.data.content;
+        Logger.log(content.length);
         viewGeneral(selectCiudades);
         var scriptPropertiesCiudades = PropertiesService.getScriptProperties();
         scriptPropertiesCiudades.setProperty('contentCiudades', JSON.stringify(content));
@@ -550,6 +550,7 @@ function mostrarDatosCeldaCiudades() {
         });
         
         var datosPareados = [];
+        
         for (var i = 0; i < datos.length; i += 2) {
             var par = datos[i];
             if (i + 1 < datos.length) {
@@ -557,6 +558,9 @@ function mostrarDatosCeldaCiudades() {
             }
             datosPareados.push(par);
         }
+        
+        datosPareados = datosPareados.slice(0, 500);
+        Logger.log(datosPareados);
         
         var regla = SpreadsheetApp.newDataValidation()
             .requireValueInList(datosPareados)
@@ -580,7 +584,7 @@ function listarCentroCostos(){
     
     var headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'WO ' + claveAPI,
+        'Authorization': claveAPI,
     };
 
     var options = {
@@ -655,59 +659,730 @@ function mostrarDatosCeldaCentroCosto() {
     }
 }
 
+////////////////////// Listar Bancos //////////////////////
+
+function listarBancos(){
+    var selectBancos = 'bancos';
+
+    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+
+    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/terceros/listarBancos';
+    
+    var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': claveAPI,
+    };
+
+    var payloadBanco = {
+        "columnaOrdenar": "nombreCompleto",
+        "pagina": 0,
+        "registrosPorPagina": 1000,
+        "orden": "ASC",
+        "filtros": [
+            {
+                "atributo": "codigo",
+                "valor": "",
+                "valor2": null,
+                "tipoFiltro": 0,
+                "tipoDato": 5,
+                "nombreColumna": null,
+                "valores": [
+                    1
+                ],
+                "clase": "terceroTipos",
+                "operador": 0,
+                "subGrupo": "filtro"
+            },
+            {
+                "atributo": "senActivo",
+                "valor": "true",
+                "valor2": null,
+                "tipoFiltro": 0,
+                "tipoDato": 1,
+                "nombreColumna": null,
+                "valores": null,
+                "clase": "terceroTipos",
+                "operador": 0,
+                "subGrupo": "filtro"
+            },
+            {
+                "atributo": "senDisponible",
+                "valor": "true",
+                "valor2": null,
+                "tipoFiltro": 0,
+                "tipoDato": 1,
+                "nombreColumna": null,
+                "valores": null,
+                "clase": "terceroTipos",
+                "operador": 0,
+                "subGrupo": "filtro"
+            }
+        ],
+        "canal": 0,
+        "registroInicial": 0
+    };
+
+    var options = {
+        'method': 'post',
+        'headers': headers,
+        'payload': JSON.stringify(payloadBanco),
+        'muteHttpExceptions': true
+    };
+    
+    var response = UrlFetchApp.fetch(apiUrl, options);
+    Logger.log(response);
+
+    if (response.getResponseCode() === 200) {
+        var responseData = response.getContentText();
+        var jsonData = JSON.parse(responseData);
+        var content = jsonData.data.content;
+        Logger.log(content);
+        viewGeneral(selectBancos);
+        var scriptPropertiesBancos = PropertiesService.getScriptProperties();
+        scriptPropertiesBancos.setProperty('contentBancos', JSON.stringify(content));
+    } 
+    else 
+    {
+        var errorResponse = response.getContentText();
+        Logger.log("Error response: " + errorResponse);
+    }
+
+}
+
+function guardarSeleccionBancos(seleccion) {
+    var seleccionString = JSON.stringify(seleccion);
+    PropertiesService.getDocumentProperties().setProperty('seleccionCeldaBancos', seleccionString);
+}
+
+function guardarSeleccionOpcionBancos(option) {
+    var seleccionOptionData = JSON.stringify(option);
+    PropertiesService.getDocumentProperties().setProperty('optionDataBancos', seleccionOptionData);
+}
+
+function getDataBancos() {
+    var scriptProperties = PropertiesService.getScriptProperties();
+    var contentDataBancos = scriptProperties.getProperty('contentBancos');
+    return JSON.parse(contentDataBancos);
+}
+
+function mostrarDatosCeldaBancos() {
+    var selectOption = PropertiesService.getDocumentProperties().getProperty('optionDataBancos');
+    var option = JSON.parse(selectOption);
+    Logger.log(option);
+    var datosString = PropertiesService.getDocumentProperties().getProperty('seleccionCeldaBancos');
+    var datos = JSON.parse(datosString);
+    datos = datos.flat(); 
+    Logger.log(datos);
+    var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var celdaActiva = hojaActiva.getActiveCell();
+    if(option == 'listar'){
+        datos = datos.filter(function(item) {
+            return item !== '';
+        });
+        for (var i = 0; i < datos.length; i+= 2) {
+            var celda1 = celdaActiva.offset(i/2, 0);
+            var celda2 = celdaActiva.offset(i/2, 1);
+            celda1.setValue(datos[i]);
+            if (i + 1 < datos.length) {
+                celda2.setValue(datos[i + 1]);
+            }
+        }
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaBancos', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataBancos', '');
+    }else if(option == 'menu'){
+        datos = datos.filter(function(item) {
+            return item !== '';
+        });
+        
+        var datosPareados = [];
+        for (var i = 0; i < datos.length; i += 2) {
+            var par = datos[i];
+            if (i + 1 < datos.length) {
+                par += ' ' + datos[i + 1];
+            }
+            datosPareados.push(par);
+        }
+        
+        var regla = SpreadsheetApp.newDataValidation()
+            .requireValueInList(datosPareados)
+            .build();
+        
+        celdaActiva.setDataValidation(regla);
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaBancos', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataBancos', '');
+
+    }
+
+}
+
+////////////////////// Listar Tipos de cuenta //////////////////////
+
+function listarTipoCuenta(){
+    var selectTipoCuenta = 'tipoCuenta';
+    
+    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+
+    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/terceros/listarTipoCuenta';
+    
+    var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': claveAPI,
+    };
+    
+    var options = {
+        'method': 'post',
+        'headers': headers,
+        'payload': JSON.stringify(payload),
+        'muteHttpExceptions': true
+    };
+    
+    var response = UrlFetchApp.fetch(apiUrl, options);
+    Logger.log(response);
+
+    if (response.getResponseCode() === 200) {
+        var responseData = response.getContentText();
+        var jsonData = JSON.parse(responseData);
+        var content = jsonData.data.content;
+        Logger.log(content);
+        viewGeneral(selectTipoCuenta);
+        var scriptPropertiesTipoCuenta = PropertiesService.getScriptProperties();
+        scriptPropertiesTipoCuenta.setProperty('contentTipoCuenta', JSON.stringify(content));
+    } 
+    else 
+    {
+        var errorResponse = response.getResponseCode();
+        if(errorResponse == 403){
+            ui.alert('Error', 'No tiene permisos para acceder a este recurso', ui.ButtonSet.OK);
+        }
+        Logger.log("Error response: " + errorResponse);
+    }
+    
+}
+
+function guardarSeleccionTipoCuenta(seleccion) {
+    var seleccionString = JSON.stringify(seleccion);
+    PropertiesService.getDocumentProperties().setProperty('seleccionCeldaTipoCuenta', seleccionString);
+}
+
+function getDataTipoCuenta() {
+    var scriptProperties = PropertiesService.getScriptProperties();
+    var contentDataTipoCuenta = scriptProperties.getProperty('contentTipoCuenta');
+    return JSON.parse(contentDataTipoCuenta);
+}
+
+function guardarSeleccionOpcionTipoCuenta(option) {
+    var seleccionOptionData = JSON.stringify(option);
+    PropertiesService.getDocumentProperties().setProperty('optionDataTipoCuenta', seleccionOptionData);
+}
+
+function mostrarDatosCeldaTipoCuenta() {
+    var selectOption = PropertiesService.getDocumentProperties().getProperty('optionDataTipoCuenta');
+    var option = JSON.parse(selectOption);
+    Logger.log(option);
+    var datosString = PropertiesService.getDocumentProperties().getProperty('seleccionCeldaTipoCuenta');
+    var datos = JSON.parse(datosString);
+    Logger.log(datos);
+    var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var celdaActiva = hojaActiva.getActiveCell();
+
+    if(option == 'listar'){
+        for (var i = 0; i < datos.length; i++) {
+            var celda = celdaActiva.offset(i,0);
+            celda.setValue(datos[i]);
+        }
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaTipoCuenta', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataTipoCuenta', '');
+    }else if(option == 'menu'){
+        var regla = SpreadsheetApp.newDataValidation()
+        .requireValueInList(datos)
+        .build();
+
+        celdaActiva.setDataValidation(regla);
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaTipoCuenta', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataTipoCuenta', '');
+    }
+}
+
+////////////////////// Listar Genero //////////////////////
+
+function listarGenero(){
+    var selectGenero = 'genero';
+
+    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+
+    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/terceros/listarGenero';
+    
+    var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': claveAPI,
+    };
+    
+    var options = {
+        'method': 'post',
+        'headers': headers,
+        'payload': JSON.stringify(payload),
+        'muteHttpExceptions': true
+    };
+    
+    var response = UrlFetchApp.fetch(apiUrl, options);
+    Logger.log(response);
+
+    if (response.getResponseCode() === 200) {
+        var responseData = response.getContentText();
+        var jsonData = JSON.parse(responseData);
+        var content = jsonData.data.content;
+        Logger.log(content);
+        viewGeneral(selectGenero);
+        var scriptPropertiesGenero = PropertiesService.getScriptProperties();
+        scriptPropertiesGenero.setProperty('contentGenero', JSON.stringify(content));
+    } 
+    else 
+    {
+        var errorResponse = response.getContentText();
+        Logger.log("Error response: " + errorResponse);
+    }
+
+}
+
+function guardarSeleccionGenero(seleccion) {
+    var seleccionString = JSON.stringify(seleccion);
+    PropertiesService.getDocumentProperties().setProperty('seleccionCeldaGenero', seleccionString);
+}
+
+function getDataGenero() {
+    var scriptProperties = PropertiesService.getScriptProperties();
+    var contentDataGenero = scriptProperties.getProperty('contentGenero');
+    return JSON.parse(contentDataGenero);
+}
+
+function guardarSeleccionOpcionGenero(option) {
+    var seleccionOptionData = JSON.stringify(option);
+    PropertiesService.getDocumentProperties().setProperty('optionDataGenero', seleccionOptionData);
+}
+
+function mostrarDatosCeldaGenero() {
+    var selectOption = PropertiesService.getDocumentProperties().getProperty('optionDataGenero');
+    var option = JSON.parse(selectOption);
+    Logger.log(option);
+    var datosString = PropertiesService.getDocumentProperties().getProperty('seleccionCeldaGenero');
+    var datos = JSON.parse(datosString);
+    Logger.log(datos);
+    var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var celdaActiva = hojaActiva.getActiveCell();
+
+    if(option == 'listar'){
+        for (var i = 0; i < datos.length; i++) {
+            var celda = celdaActiva.offset(i,0);
+            celda.setValue(datos[i]);
+        }
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaGenero', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataGenero', '');
+    }else if(option == 'menu'){
+        var regla = SpreadsheetApp.newDataValidation()
+        .requireValueInList(datos)
+        .build();
+
+        celdaActiva.setDataValidation(regla);
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaGenero', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataGenero', '');
+    }
+}
+
+////////////////////// Listar Estado Civil //////////////////////
+
+function listarEstadoCivil(){
+    var selectEstadoCivil = 'estadoCivil';
+
+    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+
+    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/terceros/listarEstadoCivil';
+    
+    var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': claveAPI,
+    };
+    
+    var options = {
+        'method': 'post',
+        'headers': headers,
+        'payload': JSON.stringify(payload),
+        'muteHttpExceptions': true
+    };
+    
+    var response = UrlFetchApp.fetch(apiUrl, options);
+    Logger.log(response);
+
+    if (response.getResponseCode() === 200) {
+        var responseData = response.getContentText();
+        var jsonData = JSON.parse(responseData);
+        var content = jsonData.data.content;
+        Logger.log(content);
+        viewGeneral(selectEstadoCivil);
+        var scriptPropertiesEstadoCivil = PropertiesService.getScriptProperties();
+        scriptPropertiesEstadoCivil.setProperty('contentEstadoCivil', JSON.stringify(content));
+    } 
+    else 
+    {
+        var errorResponse = response.getContentText();
+        Logger.log("Error response: " + errorResponse);
+    }
+}
+
+function guardarSeleccionEstadoCivil(seleccion) {
+    var seleccionString = JSON.stringify(seleccion);
+    PropertiesService.getDocumentProperties().setProperty('seleccionCeldaEstadoCivil', seleccionString);
+}
+
+function getDataEstadoCivil() {
+    var scriptProperties = PropertiesService.getScriptProperties();
+    var contentDataEstadoCivil = scriptProperties.getProperty('contentEstadoCivil');
+    return JSON.parse(contentDataEstadoCivil);
+}
+
+function guardarSeleccionOpcionEstadoCivil(option) {
+    var seleccionOptionData = JSON.stringify(option);
+    PropertiesService.getDocumentProperties().setProperty('optionDataEstadoCivil', seleccionOptionData);
+}
+
+function mostrarDatosCeldaEstadoCivil() {
+    var selectOption = PropertiesService.getDocumentProperties().getProperty('optionDataEstadoCivil');
+    var option = JSON.parse(selectOption);
+    Logger.log(option);
+    var datosString = PropertiesService.getDocumentProperties().getProperty('seleccionCeldaEstadoCivil');
+    var datos = JSON.parse(datosString);
+    Logger.log(datos);
+    var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var celdaActiva = hojaActiva.getActiveCell();
+
+    if(option == 'listar'){
+        for (var i = 0; i < datos.length; i++) {
+            var celda = celdaActiva.offset(i,0);
+            celda.setValue(datos[i]);
+        }
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaEstadoCivil', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataEstadoCivil', '');
+    }else if(option == 'menu'){
+        var regla = SpreadsheetApp.newDataValidation()
+        .requireValueInList(datos)
+        .build();
+
+        celdaActiva.setDataValidation(regla);
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaEstadoCivil', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataEstadoCivil', '');
+    }
+}
+
+////////////////////// Listar Prefijos //////////////////////
+
+function listarPrefijos(){
+    var selectPrefijos = 'prefijos';
+
+    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+
+    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/documentosTipos/listarPrefijoDocumento';
+    
+    var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': claveAPI,
+    };
+    
+    var options = {
+        'method': 'post',
+        'headers': headers,
+        'payload': JSON.stringify(payload),
+        'muteHttpExceptions': true
+    };
+    
+    var response = UrlFetchApp.fetch(apiUrl, options);
+    Logger.log(response);
+
+    if (response.getResponseCode() === 200) {
+        var responseData = response.getContentText();
+        var jsonData = JSON.parse(responseData);
+        var content = jsonData.data.content;
+        Logger.log(content);
+        viewGeneral(selectPrefijos);
+        var scriptPropertiesPrefijos = PropertiesService.getScriptProperties();
+        scriptPropertiesPrefijos.setProperty('contentPrefijos', JSON.stringify(content));
+    } 
+    else 
+    {
+        var errorResponse = response.getContentText();
+        Logger.log("Error response: " + errorResponse);
+    }
+
+}
+
+function guardarSeleccionPrefijos(seleccion) {
+    var seleccionString = JSON.stringify(seleccion);
+    PropertiesService.getDocumentProperties().setProperty('seleccionCeldaPrefijos', seleccionString);
+}
+
+function getDataPrefijos() {
+    var scriptProperties = PropertiesService.getScriptProperties();
+    var contentDataPrefijos = scriptProperties.getProperty('contentPrefijos');
+    return JSON.parse(contentDataPrefijos);
+}
+
+function guardarSeleccionOpcionPrefijos(option) {
+    var seleccionOptionData = JSON.stringify(option);
+    PropertiesService.getDocumentProperties().setProperty('optionDataPrefijos', seleccionOptionData);
+}
+
+function mostrarDatosCeldaPrefijos() {
+    var selectOption = PropertiesService.getDocumentProperties().getProperty('optionDataPrefijos');
+    var option = JSON.parse(selectOption);
+    Logger.log(option);
+    var datosString = PropertiesService.getDocumentProperties().getProperty('seleccionCeldaPrefijos');
+    var datos = JSON.parse(datosString);
+    Logger.log(datos);
+    var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var celdaActiva = hojaActiva.getActiveCell();
+
+    if(option == 'listar'){
+        for (var i = 0; i < datos.length; i++) {
+            var celda = celdaActiva.offset(i,0);
+            celda.setValue(datos[i]);
+        }
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaPrefijos', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataPrefijos', '');
+    }else if(option == 'menu'){
+        var regla = SpreadsheetApp.newDataValidation()
+        .requireValueInList(datos)
+        .build();
+
+        celdaActiva.setDataValidation(regla);
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaPrefijos', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataPrefijos', '');
+    }
+}
+
+////////////////////// Listar Paises //////////////////////
+
+function listarPaises(){
+    var selectPaises = 'paises';
+
+    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+
+    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/ciudad/listarPaises';
+    
+    var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': claveAPI,
+    };
+    
+    var options = {
+        'method': 'post',
+        'headers': headers,
+        'payload': JSON.stringify(payload),
+        'muteHttpExceptions': true
+    };
+    
+    var response = UrlFetchApp.fetch(apiUrl, options);
+    Logger.log(response);
+
+    if (response.getResponseCode() === 200) {
+        var responseData = response.getContentText();
+        var jsonData = JSON.parse(responseData);
+        var content = jsonData.data.content;
+        Logger.log(content);
+        viewGeneral(selectPaises);
+        var scriptPropertiesPaises = PropertiesService.getScriptProperties();
+        scriptPropertiesPaises.setProperty('contentPaises', JSON.stringify(content));
+    } 
+    else 
+    {
+        var errorResponse = response.getContentText();
+        Logger.log("Error response: " + errorResponse);
+    }
+
+}
+
+function guardarSeleccionPaises(seleccion) {
+    var seleccionString = JSON.stringify(seleccion);
+    PropertiesService.getDocumentProperties().setProperty('seleccionCeldaPaises', seleccionString);
+}
+
+function guardarSeleccionOpcionPaises(option) {
+    var seleccionOptionData = JSON.stringify(option);
+    PropertiesService.getDocumentProperties().setProperty('optionDataPaises', seleccionOptionData);
+}
+
+function getDataPaises() {
+    var scriptProperties = PropertiesService.getScriptProperties();
+    var contentDataPaises = scriptProperties.getProperty('contentPaises');
+    return JSON.parse(contentDataPaises);
+}
+
+function mostrarDatosCeldaPaises() {
+    var selectOption = PropertiesService.getDocumentProperties().getProperty('optionDataPaises');
+    var option = JSON.parse(selectOption);
+    Logger.log(option);
+    var datosString = PropertiesService.getDocumentProperties().getProperty('seleccionCeldaPaises');
+    var datos = JSON.parse(datosString);
+    datos = datos.flat(); 
+    Logger.log(datos);
+    var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var celdaActiva = hojaActiva.getActiveCell();
+    if(option == 'listar'){
+        for (var i = 0; i < datos.length; i++) {
+            var celda = celdaActiva.offset(i,0);
+            celda.setValue(datos[i]);
+        }
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaPaises', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataPaises', '');
+    }else if(option == 'menu'){
+        var regla = SpreadsheetApp.newDataValidation()
+        .requireValueInList(datos)
+        .build();
+
+        celdaActiva.setDataValidation(regla);
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaPaises', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataPaises', '');
+    }
+}
+
+//////////////// funcion de Prueba //////////////////////
+
+function pruebaServiciosNuevos(){
+    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+
+    // var apiUrl = 'https://api.worldoffice.cloud/api/v1/v1/unidadesDeMedida/listarUnidadMedida';
+    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/monedas/listarMonedas';
+
+    var payloadPrueba = {
+        "columnaOrdenar": "id",
+        "pagina": 0,
+        "registrosPorPagina": 1000,
+        "orden": "DESC",
+        "filtros": [
+            {
+                "atributo": "nombre",
+                "valor": "franco CFA de África Occidental",
+                "valor2": null,
+                "tipoFiltro": 1,
+                "tipoDato": 0,
+                "valores": null,
+                "clase": null,
+                "operador": 0,
+                "subGrupo": "filtro"
+            }
+        ],
+        "canal": 0,
+        "registroInicial": 0
+    };
+    
+    var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': claveAPI,
+    };
+    
+    var options = {
+        'method': 'post',
+        'headers': headers,
+        'payload': JSON.stringify(payloadPrueba),
+        'muteHttpExceptions': true
+    };
+    
+    var response = UrlFetchApp.fetch(apiUrl, options);
+    Logger.log(response);
+}
+
 ////////////////////// Llamado de vistas general //////////////////////
 
 function viewGeneral(select){
     if(select  == 'unidades'){
-        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo-unidades.html').getContent();
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-unidades.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
         .setWidth(400)
-        .setHeight(330);
-        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Selecciona una o mas unidades de medida');
+        .setHeight(370);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Unidades de medida');
     }else if(select == 'monedas'){
-        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo-monedas.html').getContent();
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-monedas.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
         .setWidth(400)
-        .setHeight(330);
-        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Selecciona una o mas monedas');
+        .setHeight(370);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Monedas');
     }else if(select == 'formaPago'){
-        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo-forma-pago.html').getContent();
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-forma-pago.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
         .setWidth(400)
-        .setHeight(330);
-        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Selecciona una o mas formas de pago');
+        .setHeight(370);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Formas de pago');
     }else if(select == 'empresas'){
-        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo-empresas.html').getContent();
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-empresas.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
         .setWidth(400)
-        .setHeight(330);
-        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Selecciona una o mas empresas');
+        .setHeight(370);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Empresas');
+    }else if(select == 'bancos'){
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-bancos.html').getContent();
+        var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
+        var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
+        .setWidth(400)
+        .setHeight(370);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Bancos');
     }else if(select == 'tipoDocumento'){
-        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo-tipo-documento.html').getContent();
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-tipo-documento.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
         .setWidth(400)
-        .setHeight(330);
-        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Selecciona uno o mas tipos de documento');
+        .setHeight(370);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Tipos de documento');
     }else if(select == 'ciudades'){
-        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo-ciudades.html').getContent();
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-ciudades.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
         .setWidth(400)
-        .setHeight(330);
-        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete
-            , 'Selecciona uno o mas ciudades');
+        .setHeight(370);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Ciudades');
     }else if(select == 'centroCostos'){
-        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo-centro-costo.html').getContent();
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-centro-costo.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
         .setWidth(400)
-        .setHeight(330);
-        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Selecciona uno o mas centros de costos');
+        .setHeight(370);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Centros de costos');
+    }else if(select == 'tipoCuenta'){
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-tipo-cuenta.html').getContent();
+        var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
+        var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
+        .setWidth(400)
+        .setHeight(320);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Tipos de cuenta');
+    }else if(select == 'genero'){
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-genero.html').getContent();
+        var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
+        var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
+        .setWidth(400)
+        .setHeight(320);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Generos');
+    }else if(select == 'estadoCivil'){
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-estado-civil.html').getContent();
+        var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
+        var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
+        .setWidth(400)
+        .setHeight(370);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Estado civil');
+    }else if(select == 'prefijos'){
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-prefijos.html').getContent();
+        var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
+        var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
+        .setWidth(400)
+        .setHeight(370);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Prefijos');
+    }else if(select == 'paises'){
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-paises.html').getContent();
+        var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
+        var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
+        .setWidth(400)
+        .setHeight(370);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Paises');
     }
-    
 }
+
+

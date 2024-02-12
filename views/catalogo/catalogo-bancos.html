@@ -9,6 +9,10 @@
     <body>
 
             <section class="containerCatalogoBase">
+                <section class="titleCatalogo">
+                    <span>Selecciona uno o mas bancos</span>
+                </section>
+
                 <section class="optionAll">
                     <span style="margin-right: 5px;">Seleccionar todos</span>
                     <label class="switch">
@@ -28,11 +32,11 @@
                         <span class="optionsMore" style="margin-bottom: 5px;"><b>Como quieres importar la información</b></span>
                         <form id="selectionExitData" style="display: flex; flex-direction: column;">
                             <div class="optionsMore">
-                                <input type="radio" id="opcion1" name="option" value="listar">
+                                <input class="radio" type="radio" id="opcion1" name="option" value="listar" checked>
                                 <label for="opcion1">Listar información en celda</label>
                             </div>
                             <div class="optionsMore">
-                                <input type="radio" id="opcion2" name="option" value="menu">
+                                <input class="radio" type="radio" id="opcion2" name="option" value="menu">
                                 <label for="opcion2">Crear menu desplegable</label>
                             </div>
                         </form>
@@ -40,11 +44,28 @@
                     <button type="button" class="buttonImport" onclick="sendDataSelected()">Agregar</button>
                 </section>
             </section>
+
+            <div id="loading" class="loading">
+                <div class="d-flex justify-content-center align-items-end">
+                        <div class="spinner-grow" style="width: 1rem; height: 1rem" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                        <div class="spinner-grow " style="width: 2rem; height: 2em" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                        <div class="spinner-grow" style="width: 3rem; height: 3rem" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                </div>
+                <p style=" margin-top: 3vh; font-weight: 600; color: #0d95f0;">Cargando datos</p>
+            </div>
         
             <script>
 
                     var tabla = document.getElementById('miTabla');
                     var optionsExit = document.getElementsByName('option');
+                    var optionChecked = document.querySelector('input[name="option"]:checked');
+                    var contenedorGlobal = document.querySelector('.containerCatalogoBase');
                     var selectOptionSend;
                     var selecciones = [];
                     var resulAll = [];
@@ -56,14 +77,16 @@
                         result.forEach(function(elemento) {
                         var fila = document.createElement('tr');
                         var celda = document.createElement('td');
-                        celda.textContent = `${elemento.identificacion} ${' '} ${elemento.nombre}`;
+                        celda.textContent = `${elemento.identificacion} ${' '} ${elemento.nombreCompleto}`;
                         celda.classList.add('celdaTabla');
                         fila.appendChild(celda);
                         fila.classList.add('filaTabla');
                         fila.addEventListener('click', clickCell);
                         tabla.appendChild(fila);
                     });
-                    }).getDataEmpresa();
+                        contenedorGlobal.style.display = 'flex';
+                        document.getElementById('loading').remove();
+                    }).getDataBancos();
 
                     document.getElementById('addAllCheckbox').addEventListener('change', function(e) {
                         if (e.target.checked) {
@@ -71,7 +94,7 @@
                             var dataResult = [...resulAll];
 
                             selecciones = dataResult.map(function(elemento) {
-                                return elemento.identificacion + ' ' + elemento.nombre;
+                                return elemento.identificacion + ' ' + elemento.nombreCompleto;
                             });
                             var cells = document.querySelectorAll('td');
                             for (var i = 0; i < cells.length; i++) {
@@ -88,15 +111,19 @@
                         selecciones = selecciones.map(function(seleccion) {
                             return seleccion.split(/\s(.+)/);
                         });
-                        google.script.run.guardarSeleccionEmpresa(selecciones);
+                        google.script.run.guardarSeleccionBancos(selecciones);
                     });
 
+                    if (optionChecked) {
+                        selectOptionSend = optionChecked.value;
+                        google.script.run.guardarSeleccionOpcionBancos(selectOptionSend);
+                    }
 
                     for(var i = 0; i < optionsExit.length; i++) {
                         optionsExit[i].addEventListener('change', function() {
                             console.log(this.value,'this.valueCheck');
                             selectOptionSend = this.value;
-                            google.script.run.guardarSeleccionOpcionEmpresa(selectOptionSend);
+                            google.script.run.guardarSeleccionOpcionBancos(selectOptionSend);
                         });
                     }
 
@@ -118,12 +145,12 @@
                             evento.target.classList.add('selectedCelda');
                         }
 
-                        google.script.run.guardarSeleccionEmpresa(selecciones);
+                        google.script.run.guardarSeleccionBancos(selecciones);
                     }
 
                     function sendDataSelected() {
                         console.log(selecciones,'selecciones');
-                        google.script.run.mostrarDatosCeldaEmpresa();
+                        google.script.run.mostrarDatosCeldaBancos();
                         google.script.host.close();
                     }
 
