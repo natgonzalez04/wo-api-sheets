@@ -15,12 +15,18 @@ function mostrarPaginaPrincipal() {
 }
 
 function guardarClaveAPI(clave) {
-  PropertiesService.getDocumentProperties().setProperty('claveAPI', clave);
+  PropertiesService.getUserProperties().setProperty('claveAPI', clave);
+}
+
+//almacenamiento de la clave api global
+
+function almacenamientoClave() {
+  return PropertiesService.getUserProperties().getProperty('claveAPI');
 }
 
 function validacionClaveAPI() {
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
-    var apiUrl = 'https://apidev.worldoffice.cloud/validaTokenAPI';
+    var claveAPI = almacenamientoClave();
+    var apiUrl = 'https://api.worldoffice.cloud/validaTokenAPI';
 
     var headers = {
       'Content-Type': 'application/json',
@@ -37,10 +43,10 @@ function validacionClaveAPI() {
     Logger.log(response);
     if (response == 'true'){
       activarOpciones();
-      ui.alert('Tu clave API ha sido confirmada con exito.');
+      ui.alert('Tu token API ha sido confirmado con exito.');
       return Boolean(claveAPI);
     }else {
-      ui.alert('Tu clave API esta inactiva y/o no ha sido configurada.');
+      ui.alert('Tu token API esta inactivo y/o no ha sido configurado.');
       return Boolean(claveAPI);
     }
 
@@ -64,11 +70,17 @@ function activarOpciones(){
     .addItem('Unidades de medida', 'listarUnidadesMedida')
 
     var Terceros = ui.createMenu('Terceros')
-    .addItem('Consultar todos los terceros', 'consumeAndDisplayAPI')
-    .addItem('Consultar direcciones', 'direccionesListar');
-    
+    .addItem('Listar terceros', 'listarTerceros')
+    .addItem('Consultar tercero', 'consultarTerceros')
+    .addItem('Consultar dirección tercero', 'consultarTercerosDireccion')
+    .addItem('Listar clasificación impuestos', 'listarClasificacionImpuestos')
+    .addItem('Tipos de contribuyente', 'listarTiposContribuyente')
+    .addItem('Tipos de identificación', 'listarTiposIdentificacion')
+    .addItem('Tipos de tercero', 'listarTiposTercero')
+
+
     var Documentos = ui.createMenu('Documentos')
-    .addItem('Consultar documentos de ventas', 'listardocumentosVenta')
+    .addItem('Consultar documentos de ventas', 'listarDocumentosVenta')
     .addItem('Consultar documentos de compra', 'listardocumentosCompra');
 
     var Inventarios = ui.createMenu('Inventarios')
@@ -95,9 +107,9 @@ function activarOpciones(){
 }
 
 function mostrarClaveAPI(){
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = PropertiesService.getUserProperties().getProperty('claveAPI');
     var claveAPIFormateada = claveAPI.match(/.{1,50}/g).join("\n");
-    ui.alert('Tu clave API es: \n' + claveAPIFormateada);
+    ui.alert('Tu token API en uso es: \n\n' + claveAPIFormateada);
 }
 
 ////////////////////// funciones de documentos //////////////////////
@@ -121,6 +133,8 @@ function bodegasListar(){
 
 function cerrarSesion(){
   PropertiesService.getDocumentProperties().deleteAllProperties();
+  PropertiesService.getUserProperties().deleteAllProperties();
+  PropertiesService.getScriptProperties().deleteAllProperties();
   onOpen();
 }
 

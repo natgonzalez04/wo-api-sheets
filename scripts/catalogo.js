@@ -1,6 +1,6 @@
 ////////////////////// Funciones de catalogo //////////////////////
 
-var ui = SpreadsheetApp.getUi();
+// var ui = SpreadsheetApp.getUi();
 
 var payload = {
     "columnaOrdenar": "id",
@@ -17,9 +17,9 @@ var payload = {
 function listarUnidadesMedida() {
     var selectUnidad = 'unidades';
 
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/unidadesDeMedida/listarUnidadMedida';
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/unidadesDeMedida/listarUnidadMedida';
     
     var headers = {
         'Content-Type': 'application/json',
@@ -102,9 +102,9 @@ function mostrarDatosCeldaUnidad() {
 function listarMonedas(){
     var selectMoneda = 'monedas';
 
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/monedas/listarMonedas';
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/monedas/listarMonedas';
     
     var headers = {
         'Content-Type': 'application/json',
@@ -190,9 +190,9 @@ function mostrarDatosCeldaMoneda() {
 function listarFormasPago(){
     var selectFormaPago = 'formaPago';
 
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/formasDePago/listarFormaPagoDocumento';
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/formasDePago/listarFormaPagoDocumento';
     
     var headers = {
         'Content-Type': 'application/json',
@@ -274,9 +274,9 @@ function mostrarDatosCeldaFormaPago() {
 function listarEmpresas(){
     var selectEmpresas = 'empresas';
 
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/empresas/listarEmpresas';
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/empresas/listarEmpresas';
     
     var headers = {
         'Content-Type': 'application/json',
@@ -381,9 +381,9 @@ function mostrarDatosCeldaEmpresa() {
 function listarTiposDocumento(){
     var selectTipoDoc = 'tipoDocumento';
 
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/documentosTipos/listarTipoDocumento';
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/documentosTipos/listarTipoDocumento';
     
 
     
@@ -468,9 +468,9 @@ function mostrarDatosCeldaTipoDoc() {
 function listarCiudades(){
     var selectCiudades = 'ciudades';
 
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/ciudad/listarCiudades';
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/ciudad/listarCiudades';
     
     var headers = {
         'Content-Type': 'application/json',
@@ -578,9 +578,9 @@ function mostrarDatosCeldaCiudades() {
 function listarCentroCostos(){
     var selectCentroCostos = 'centroCostos';
 
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/centrosDeCosto/listarCentroCosto';
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/centrosDeCosto/listarCentroCosto';
     
     var headers = {
         'Content-Type': 'application/json',
@@ -664,9 +664,9 @@ function mostrarDatosCeldaCentroCosto() {
 function listarBancos(){
     var selectBancos = 'bancos';
 
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/terceros/listarBancos';
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/terceros/listarBancos';
     
     var headers = {
         'Content-Type': 'application/json',
@@ -820,9 +820,9 @@ function mostrarDatosCeldaBancos() {
 function listarTipoCuenta(){
     var selectTipoCuenta = 'tipoCuenta';
     
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/terceros/listarTipoCuenta';
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/terceros/listarTipoCuenta';
     
     var headers = {
         'Content-Type': 'application/json',
@@ -908,9 +908,9 @@ function mostrarDatosCeldaTipoCuenta() {
 function listarGenero(){
     var selectGenero = 'genero';
 
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/terceros/listarGenero';
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/terceros/listarGenero';
     
     var headers = {
         'Content-Type': 'application/json',
@@ -993,9 +993,9 @@ function mostrarDatosCeldaGenero() {
 function listarEstadoCivil(){
     var selectEstadoCivil = 'estadoCivil';
 
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/terceros/listarEstadoCivil';
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/terceros/listarEstadoCivil';
     
     var headers = {
         'Content-Type': 'application/json',
@@ -1077,9 +1077,9 @@ function mostrarDatosCeldaEstadoCivil() {
 function listarPrefijos(){
     var selectPrefijos = 'prefijos';
 
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/documentosTipos/listarPrefijoDocumento';
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/documentosTipos/listarPrefijoDocumento';
     
     var headers = {
         'Content-Type': 'application/json',
@@ -1162,9 +1162,9 @@ function mostrarDatosCeldaPrefijos() {
 function listarPaises(){
     var selectPaises = 'paises';
 
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
+    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/ciudad/listarPaises';
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/ciudad/listarPaises';
     
     var headers = {
         'Content-Type': 'application/json',
@@ -1242,51 +1242,6 @@ function mostrarDatosCeldaPaises() {
     }
 }
 
-//////////////// funcion de Prueba //////////////////////
-
-function pruebaServiciosNuevos(){
-    var claveAPI = PropertiesService.getDocumentProperties().getProperty('claveAPI');
-
-    // var apiUrl = 'https://api.worldoffice.cloud/api/v1/v1/unidadesDeMedida/listarUnidadMedida';
-    var apiUrl = 'https://apidev.worldoffice.cloud/api/v1/monedas/listarMonedas';
-
-    var payloadPrueba = {
-        "columnaOrdenar": "id",
-        "pagina": 0,
-        "registrosPorPagina": 1000,
-        "orden": "DESC",
-        "filtros": [
-            {
-                "atributo": "nombre",
-                "valor": "franco CFA de África Occidental",
-                "valor2": null,
-                "tipoFiltro": 1,
-                "tipoDato": 0,
-                "valores": null,
-                "clase": null,
-                "operador": 0,
-                "subGrupo": "filtro"
-            }
-        ],
-        "canal": 0,
-        "registroInicial": 0
-    };
-    
-    var headers = {
-        'Content-Type': 'application/json',
-        'Authorization': claveAPI,
-    };
-    
-    var options = {
-        'method': 'post',
-        'headers': headers,
-        'payload': JSON.stringify(payloadPrueba),
-        'muteHttpExceptions': true
-    };
-    
-    var response = UrlFetchApp.fetch(apiUrl, options);
-    Logger.log(response);
-}
 
 ////////////////////// Llamado de vistas general //////////////////////
 

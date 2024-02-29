@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <base target="_top">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+    </head>
+    <body>
+
+            <section class="containerCatalogoBase">
+                <section class="titleCatalogo">
+                    <span>Selecciona el tipo de documento de venta y el rango de registros que quieres listar </span>
+                </section>
+                <section class="observacionesInfo">
+                    <h4>Para tener en cuenta</h4>
+                    <ul>
+                        <li>
+                            Los tiempos de respuesta pueden variar segun la cantidad de registros.
+                        </li>
+                        <li>
+                            Tus registros seran listados en orden descendente apartir de la celda activa seleccionada con sus respectivas columnas a derecha.
+                        </li>
+                        <li>
+                            En la primera fila de tus registros seran agregados los nombres de las columnas asignadas a los campos listados. 
+                        </li>
+                    </ul>
+                </section>
+                <div class="containerDocumento">
+                    <label style="font-weight: 600; color: #5a5a5a; margin-right: 15px;" for="tipoDocumento">Tipo de documento*: </label>
+                    <select name="tipoDocumento" id="tipoDocumento" class="opcionDocumento">
+                        <option value="" disabled selected>Selecciona</option>
+                        <option value="FV">Factura de venta</option>
+                        <option value="NCV">Nota credito venta</option>
+                        <option value="NDV">Nota debito venta</option>
+                        <option value="REM">Remision de ventas</option>
+                        <option value="CZ">Cotización</option>
+                        <option value="PD">Pedido</option>
+                    </select>
+                </div>
+                <section class="containerPaginacionDocumentos">
+
+                    <div style="margin-right: 30px;">
+                        <label for="registroInicial">Fecha inicial*:
+                        <input type="date" name="registroInicial" id="registroInicial" min="0" max="10000" placeholder="100" value="1">
+                        </label>
+                    </div>
+                    <div >
+                        <label for="registroFinal">Fecha final*:
+                        <input type="date" name="registroFinal" id="registroFinal" min="0" max="10000" placeholder="1000" value="100">
+                        </label>
+                    </div>
+                    <div class="mensajeError">
+                        <span>Por favor, completa los campos para requeridos para continuar</span>
+                    </div>
+                </section>
+
+                <section class="containerEjemplo">
+                    <span>Ejemplo:</span>
+
+
+                </section>
+
+                <button type="button" class="buttonImport" onclick="sendDataSelected()">Agregar</button>
+                
+            </section>
+
+            <div id="loading" class="loading" style="display:none;">
+                <div class="d-flex justify-content-center align-items-end">
+                        <div class="spinner-grow" style="width: 1rem; height: 1rem" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                        <div class="spinner-grow " style="width: 2rem; height: 2em" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                        <div class="spinner-grow" style="width: 3rem; height: 3rem" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                </div>
+                <p style=" margin-top: 3vh; font-weight: 600; color: #0d95f0;">Cargando datos</p>
+            </div>
+        
+            <script>
+
+                    var contenedorGlobal = document.querySelector('.containerCatalogoBase');
+                    var contenedorLoading = document.querySelector('.loading');
+                    
+                    contenedorGlobal.style.display = 'flex';
+
+                    var encabezados = ['Id', 'Fecha', 'Prefijo', 'Número', 'Empresa', 'Cliente', 'Vendedor', 'Forma de Pago', 'Concepto'];
+                    var datos = ['1', '2024-01-12', 'DVVP','42158', 'Compañia Electrodomesticos SAS', 'Company LTDA', 'William Diaz', 'Crédito', 'Factura de venta'];
+
+                
+                    var tabla = document.createElement('table');
+
+                
+                    var thead = document.createElement('thead');
+                    var tr = document.createElement('tr');
+                    for (var i = 0; i < encabezados.length; i++) {
+                        var th = document.createElement('th');
+                        th.textContent = encabezados[i];
+                        th.classList.add('formatoTabla');
+                        tr.appendChild(th);
+                    }
+                    thead.appendChild(tr);
+                    tabla.appendChild(thead);
+
+                    
+                    var tbody = document.createElement('tbody');
+                    tr = document.createElement('tr');
+                    for (var i = 0; i < datos.length; i++) {
+                        var td = document.createElement('td');
+                        td.textContent = datos[i];
+                        td.classList.add('formatoTablaContenido');
+                        tr.appendChild(td);
+                    }
+                    tbody.appendChild(tr);
+                    tabla.appendChild(tbody);
+
+            
+                    var seccion = document.querySelector('.containerEjemplo');
+                    seccion.appendChild(tabla);
+
+
+    
+                    function guardarSeleccion() {
+                        var registroInicial = document.getElementById('registroInicial');
+                        var registroFinal = document.getElementById('registroFinal');
+                        var mensajeError = document.querySelector('.mensajeError');
+                        var selectDocument = document.getElementById("tipoDocumento");
+
+                        if (!registroInicial.value || !registroFinal.value || !selectDocument.value) {
+                            mensajeError.style.display = 'block';
+                            return false;
+                        }else{
+                            mensajeError.style.display = 'none';
+                            var seleccionPaginado = {
+                                registroInicial: registroInicial.value,
+                                registroFinal: registroFinal.value,
+                                tipoDocumento: selectDocument.value
+                            };
+                            console.log(seleccionPaginado);
+                            google.script.run.guardarSeleccionPaginadoDocumentos(seleccionPaginado);
+                            return true;
+                        }
+                        
+
+                    }
+
+                    registroInicial.onchange = guardarSeleccion;
+                    registroFinal.onchange = guardarSeleccion;
+                    selectDocument.onchange = guardarSeleccion;
+
+                    function sendDataSelected() {
+                        var validacionCampos = guardarSeleccion();
+
+                        if (validacionCampos) {
+                            contenedorGlobal.style.display = 'none';
+                            contenedorLoading.style.display = 'flex';
+                            google.script.run.withSuccessHandler(function(result) {
+                                google.script.host.close();
+                            }).withFailureHandler(function(error) {
+                                google.script.host.close();
+                            }).mostraDocumentosVenta();
+                        }
+                    }
+
+            </script>
+    </body>
+</html>

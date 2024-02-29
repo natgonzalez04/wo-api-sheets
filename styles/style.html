@@ -41,6 +41,17 @@
             overflow-x: hidden;
             /* background-color: tomato; */
         }
+        .containerCatalogoColumnas{
+            display: flex;
+            padding: 0 0.5em 0 0.5em;
+            margin: 0.5em 0 1em 0;
+            justify-content: flex-start;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            /* background-color: tomato; */
+        }
         .titleCatalogo{
             display: inline-flex;
             justify-content: flex-start;
@@ -64,11 +75,18 @@
             border-radius: 5px;
             height: auto;
         }
+        .tablaDataColumnas{
+            width: 83vw;
+            outline: none;
+            background-color: transparent;
+            border-radius: 5px;
+            height: auto;
+        }
         .filaTabla{
             outline: none;
         }
         .filaTabla:nth-child(odd) {
-            background-color: #e9f6fc;
+            background-color: #f2fbff;
         }
         .celdaTabla{
             border-bottom: 1px solid #e1e1e1;
@@ -177,6 +195,7 @@
 
         input:focus + .slider {
             box-shadow: 0 0 1px #2196F3;
+            
         }
 
         input:checked + .slider:before {
@@ -197,9 +216,9 @@
         .buttonImport{
             background: linear-gradient(to bottom,#2fa6f4 0,#0d95f0 100%);
             color: #ffffff;
-            padding: 8px 20px;
-            margin: 10px 0 5px 5px;
-            width: 35vw;
+            padding: 7px 20px;
+            margin: 13px 0 5px 5px;
+            width: 150px;
             border: none;
             cursor: pointer;
             border-radius: 8px;
@@ -211,6 +230,7 @@
             background: linear-gradient(to bottom, #a6c0d4 0, #95b8d0 100%);
             color: #cccccc;
             cursor: not-allowed;
+            
         }
         
         .buttonImport:hover {
@@ -235,6 +255,172 @@
             animation-name: spinner-grow;
             animation-duration: 2s; 
             color: #0d95f0;
+        }
+
+        .observacionesInfo{
+            width: 100%;
+            float: left;
+            font-size: 13px;
+        }
+
+        .observacionesInfo h4{
+            color: #0d95f0;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .observacionesInfo li{
+            list-style-type: circle;
+        }
+
+
+        .containerPaginacion{
+            width: 102%;
+            display: inline-flex;
+            font-size: 14px;
+            justify-content: flex-start;
+            margin-top: 4vh;
+            padding-left: 2vw;
+        }
+
+        .containerPaginacion input{
+            border: none;
+            border-bottom: #646464 1px solid;
+            outline: none;
+            width: 70px;
+            text-align: center;
+        }
+        .containerPaginacion label{
+            font-weight: 600;
+            color: #5a5a5a;
+        }
+
+        .containerConsultaTercero{
+            width: 102%;
+            display: flex;
+            font-size: 14px;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: 4vh;
+            padding-left: 2vw;
+        }
+
+        .containerConsultaTercero input{
+            border: none;
+            border-bottom: #646464 1px solid;
+            outline: none;
+            width: 180px;
+            text-align: center;
+        }
+        .containerConsultaTercero label{
+            font-weight: 600;
+            color: #5a5a5a;
+        }
+
+        .containerEjemplo{
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-self: start;
+            justify-content: space-evenly;
+            margin: 30px 0;
+        }
+
+        .containerEjemplo span{
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 0;
+            }
+        input[type=number] { 
+            appearance: none;
+            -moz-appearance:textfield; 
+        }
+
+        .formatoTabla{
+            width: 5vw;
+            font-size: 12px;
+            background: #c1d7ff;
+            color: #1e458d;
+            text-align: center;
+            border: #ffffff solid 1px;
+        }
+
+        .formatoTabla:first-of-type {
+            border-top-left-radius: 4px;
+        }
+
+        .formatoTabla:last-of-type {
+            border-top-right-radius: 4px;
+        }
+
+        .formatoTablaContenido{
+            font-size: 12px;
+            text-align: center;
+            border-left: #adadad5c solid 1px;
+            border-right: #adadad5c solid 1px;
+            border-bottom: #adadad5c solid 1px;
+        }
+
+        .mensajeError{
+            color: #b91111;
+            width: 180px;
+            margin-left: 30px;
+            text-align: center;
+            display: none;
+            font-size: 12px;
+        }
+
+        .mensajeErrorConsulta{
+            color: #b91111;
+            width: 350px;
+            margin: 5px 0 0 100px;
+            text-align: center;
+            display: none;
+            font-size: 12px;
+        }
+
+        .containerPaginacionDocumentos{
+            width: 102%;
+            display: inline-flex;
+            font-size: 14px;
+            justify-content: flex-start;
+            margin-top: 4vh;
+            padding-left: 2vw;
+        }
+
+        .containerPaginacionDocumentos input{
+            border: none;
+            border-bottom: #646464 1px solid;
+            outline: none;
+            width: 130px;
+            text-align: center;
+        }
+        .containerPaginacionDocumentos label{
+            font-weight: 600;
+            color: #5a5a5a;
+        }
+
+        .containerDocumento{
+            width: 98%;
+            display:inline-flex;
+            font-size: 14px;
+        }
+
+        .opcionDocumento{
+            border: none;
+            font-family: 'Raleway', sans-serif;
+            border-bottom: #646464 1px solid;
+            font-size: 14px;
+            outline: none;
+            width: 310px;
         }
 
         @keyframes spinner-grow {
