@@ -80,15 +80,16 @@ function activarOpciones(){
 
 
     var Documentos = ui.createMenu('Documentos')
-    .addItem('Consultar documentos de ventas', 'listarDocumentosVenta')
-    .addItem('Consultar documentos de compra', 'listardocumentosCompra');
+    .addItem('Listar documentos de ventas', 'listarDocumentosVenta')
+    .addItem('Consultar documentos de ventas', 'consultarDocumentoVenta')
+    .addItem('Listar documentos de compra', 'listarDocumentosCompra');
 
     var Inventarios = ui.createMenu('Inventarios')
     .addItem('Consultar todos los inventarios', 'inventariosListar')
     .addItem('Consultar bodegas', 'bodegasListar');
 
     var CuentasContables = ui.createMenu('Cuentas Contables')
-    .addItem('Consultar cuentas contables', 'inventariosListar');
+    .addItem('Listar cuentas contables', 'listarCuentasContables');
 
     var Contabilidad = ui.createMenu('Contabilidad')
     .addItem('Consultar documentos contables', 'documentosVenta');

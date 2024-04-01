@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <base target="_top">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+    </head>
+    <body>
+
+            <section class="containerCatalogoBase">
+                <section class="titleCatalogo">
+                    <span>Selecciona una o mas cuentas contables</span>
+                </section>
+
+                <section class="containerFiltros">
+                        <div class="optFiltro">
+                            <label for="numeroCuenta">Cuenta:
+                                <input type="number" name="numeroCuenta" id="numeroCuenta" min="0" placeholder=" # Cuenta">
+                            </label>
+                        </div>
+                        <div class="optFiltro" style="margin-right: -15px">
+                                <label style="font-weight: 600; color: #5a5a5a; margin-right: 15px;" for="naturalezaCuenta">Naturaleza: </label>
+                                <select name="naturalezaCuenta" id="naturalezaCuenta" class="opcionDocumento">
+                                    <!-- <option value="" disabled selected>Selecciona</option> -->
+                                </select>
+                        </div>
+                            
+                </section>
+
+                <section class="optionAll">
+                    <span style="margin-right: 5px;">Seleccionar todos</span>
+                    <label class="switch">
+                        <input type="checkbox" id="addAllCheckbox">
+                        <span class="slider"></span>
+                    </label>
+                </section>
+                <section class="containerCatalogo">
+                    <table id="miTabla" class="tablaData">
+        
+                    </table>
+                    
+                </section>
+                <section class="optionsData">
+                    
+                    <section>
+                        <span class="optionsMore" style="margin-bottom: 5px;"><b>Como quieres importar la información</b></span>
+                        <form id="selectionExitData" style="display: flex; flex-direction: column;">
+                            <div class="optionsMore">
+                                <input class="radio" type="radio" id="opcion1" name="option" value="listar" checked>
+                                <label for="opcion1">Listar información en celda</label>
+                            </div>
+                            <div class="optionsMore" style="display: none;">
+                                <input class="radio" type="radio" id="opcion2" name="option" value="menu">
+                                <label for="opcion2">Crear menu desplegable</label>
+                            </div>
+                        </form>
+                    </section>
+                    <button type="button" class="buttonImport" onclick="sendDataSelected()">Agregar</button>
+                </section>
+            </section>
+
+            <div id="loading" class="loading">
+                <div class="d-flex justify-content-center align-items-end">
+                        <div class="spinner-grow" style="width: 1rem; height: 1rem" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                        <div class="spinner-grow " style="width: 2rem; height: 2em" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                        <div class="spinner-grow" style="width: 3rem; height: 3rem" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                </div>
+                <p style=" margin-top: 3vh; font-weight: 600; color: #0d95f0;">Cargando datos</p>
+            </div>
+        
+            <script>
+
+                    var tabla = document.getElementById('miTabla');
+                    var optionsExit = document.getElementsByName('option');
+                    var optionChecked = document.querySelector('input[name="option"]:checked');
+                    var contenedorGlobal = document.querySelector('.containerCatalogoBase');
+                    var selectNaturalezaCuenta = document.getElementById('naturalezaCuenta');
+                    var selectOptionSend;
+                    var selecciones = [];
+                    var resulAll = [];
+
+                    google.script.run.withSuccessHandler(function(result) {
+                            
+                        console.log(result,'result');
+                        resulAll = result;
+                        result.forEach(function(elemento) {
+                        var fila = document.createElement('tr');
+                        var celda = document.createElement('td');
+                        celda.textContent = `${elemento.codigo} ${' '} ${elemento.nombre}`;
+                        celda.classList.add('celdaTabla');
+                        fila.appendChild(celda);
+                        fila.classList.add('filaTabla');
+                        fila.addEventListener('click', clickCell);
+                        tabla.appendChild(fila);
+
+                    });
+                        contenedorGlobal.style.display = 'flex';
+                        document.getElementById('loading').remove();
+
+                        selectNaturalezaCuenta.innerHTML = '';
+
+                        var optionSelecciona = document.createElement('option');
+                        optionSelecciona.value = "";
+                        optionSelecciona.text = "Selecciona";
+                        optionSelecciona.disabled = true;
+                        optionSelecciona.selected = true;
+                        selectNaturalezaCuenta.insertBefore(optionSelecciona, selectNaturalezaCuenta.firstChild);
+
+                        var optionTodos = document.createElement('option');
+                        optionTodos.value = "todos";
+                        optionTodos.text = "Todos";
+                        selectNaturalezaCuenta.insertBefore(optionTodos, selectNaturalezaCuenta.children[1]);
+
+                        var addedValues = {};
+                        for (var i = 0; i < resulAll.length; i++) {
+                            if (!addedValues[resulAll[i].cuentaContableTipo.cuentaContableNaturaleza]) {
+                            var optionNaturaleza = document.createElement('option');
+                            optionNaturaleza.value = resulAll[i].cuentaContableTipo.id; 
+                            optionNaturaleza.text = resulAll[i].cuentaContableTipo.cuentaContableNaturaleza; 
+                            selectNaturalezaCuenta.appendChild(optionNaturaleza);
+                            addedValues[resulAll[i].cuentaContableTipo.cuentaContableNaturaleza] = true;
+                            }
+                        }
+
+                    }).getDataCuentaContable();
+                    
+                    selectNaturalezaCuenta.addEventListener('change', function() {
+                        var selectedOptionText = this.options[this.selectedIndex].text;
+                        console.log('El texto de la opción seleccionada es: ' + selectedOptionText);
+
+
+                        resulAll = resulAll.filter(function(elemento) {
+                            return elemento.cuentaContableTipo.cuentaContableNaturaleza == selectedOptionText;
+                        });
+
+                        console.log(resulAll);
+                    });
+
+                    document.getElementById('addAllCheckbox').addEventListener('change', function(e) {
+                        if (e.target.checked) {
+                            
+                            var dataResult = [...resulAll];
+
+                            selecciones = dataResult.map(function(elemento) {
+                                return elemento.codigo + ' ' + elemento.nombre;
+                            });
+                            var cells = document.querySelectorAll('td');
+                            for (var i = 0; i < cells.length; i++) {
+                                cells[i].classList.add('selectedCelda');
+                            }
+
+                        } else {
+                            selecciones = [];
+                            var cells = document.querySelectorAll('td');
+                            for (var i = 0; i < cells.length; i++) {
+                                cells[i].classList.remove('selectedCelda');
+                            }
+                        }
+                        selecciones = selecciones.map(function(seleccion) {
+                            return seleccion.split(/\s(.+)/);
+                        });
+                        google.script.run.guardarSeleccionCuentaContable(selecciones);
+                    });
+
+                    if (optionChecked) {
+                        selectOptionSend = optionChecked.value;
+                        google.script.run.guardarSeleccionOpcionCuentaContable(selectOptionSend);
+                    }
+
+                    for(var i = 0; i < optionsExit.length; i++) {
+                        optionsExit[i].addEventListener('change', function() {
+                            console.log(this.value,'this.valueCheck');
+                            selectOptionSend = this.value;
+                            google.script.run.guardarSeleccionOpcionCuentaContable(selectOptionSend);
+                        });
+                    }
+
+                    function clickCell(evento) {
+                        var seleccion = evento.target.textContent;
+                        var seleccionArray = seleccion.split('   ');
+
+                        var isInArray = selecciones.some(function(elemento) {
+                            return elemento.join('   ') === seleccionArray.join('   ');
+                        });
+
+                        if (isInArray) {
+                            selecciones = selecciones.filter(function(elemento) {
+                                return elemento.join('   ') !== seleccionArray.join('   ');
+                            });
+                            evento.target.classList.remove('selectedCelda');
+                        } else {
+                            selecciones.push(seleccionArray);
+                            evento.target.classList.add('selectedCelda');
+                        }
+
+                        google.script.run.guardarSeleccionCuentaContable(selecciones);
+                    }
+
+                    function sendDataSelected() {
+                        console.log(selecciones,'selecciones');
+                        google.script.run.mostrarDatosCeldaCuentaContable();
+                        google.script.host.close();
+                    }
+
+            </script>
+    </body>
+</html>

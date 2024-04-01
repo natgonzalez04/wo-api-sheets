@@ -755,7 +755,23 @@ function mostrarDatosPaginadoTercero() {
             j = 0;
             for (var key in keys) {
                 var cell = celdaActiva.offset(i + 1, j);  
-                cell.setValue(content[i][key]);
+                if(key == 'senActivo'){
+                    if(content[i][key] == true){
+                        cell.setValue('Activo');
+                    }else{
+                        cell.setValue('Inactivo');
+                    }
+                }else if(key == 'aplicaICAVentas'){
+                    if(content[i][key] == true){
+                        cell.setValue('Si');
+                    }else{
+                        cell.setValue('No');
+                    }
+                }else if(key == 'id'){
+                    cell.setValue(String(content[i][key]));
+                }else{
+                    cell.setValue(content[i][key]); 
+                }
                 j++;
             }
         }
@@ -832,5 +848,10 @@ function mapeoErrores(response){
         .setWidth(430)
         .setHeight(120);
         SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Error');
-    }    
+    } else if(response == '404'){
+        var htmlOutput = HtmlService.createHtmlOutput('<p style="font-family: Raleway, sans-serif; font-size:14px; text-align: center; margin:-25px 0 10px 0;"><span style="color:#2196F3; font-size: 48px;">&#9888;</span><br><br>No se encontraron elementos con los criterios de busqueda seleccionados.</p>')
+        .setWidth(430)
+        .setHeight(120);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Error');
+    }     
 }
