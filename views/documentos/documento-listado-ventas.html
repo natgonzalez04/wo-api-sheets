@@ -39,16 +39,9 @@
                     </select>
                 </div>
                 <section style="width: 100%;">
-                    <div class="mensajeErrorInicial">
-                        <span>Por favor, espera estamos validando la cantidad de registros disponibles a importar</span>
-                    </div>
 
-                    <div class="containerTotalRegistros">
-                        <span class="registros">Total registros disponibles: </span>
-                        <span class="registros" id="registrosDocumento"> </span>
-                    </div>
 
-                    <div class="containerOpcionesImportacion">
+                    <div class="containerOpcionesImportacion" style="margin-top: 15px;">
                         <span class="optionsMore" style="margin-bottom: 5px;"><b>Como quieres importar la información</b></span>
                         <div style="display: inline-flex; align-items: center;">
                             <section class="optionAllMore">
@@ -58,14 +51,36 @@
                                     <span class="slider"></span>
                                 </label>
                             </section>
-                            <section style="margin-left: 5%;">
-                                <button type="button" class="btnFiltroFecha" onclick="activarFiltrosFecha()">Rango fecha</button>
+                            <section style="margin-left: 3%;">
+                                <button type="button" class="btnFiltroFecha" id="btnFecha"  onclick="activarFiltrosFecha()">Rango fecha</button>
+                            </section>
+                            <section style="margin-left: 3%;">
+                                <button type="button" class="btnFiltroFecha" id="btnNumero"  onclick="activarFiltrosNumero()">Rango número</button>
+                            </section>
+                            <section style="margin-left: 3%;">
+                                <button type="button" class="btnFiltroFecha" id="btnPrefijo"  onclick="activarFiltrosPrefijo()">Prefijo</button>
+                            </section>
+                            <section style="margin-left: 3%;">
+                                <button type="button" class="btnFiltroFecha" id="btnTercero"  onclick="activarFiltrosTercero()">Tercero</button>
                             </section>
                         </div>
                     </div>
 
+                    <div class="mensajeErrorInicial">
+                        <span>Por favor, espera estamos validando la cantidad de registros disponibles a importar</span>
+                    </div>
+
+                    <div class="containerTotalRegistros">
+                        <span class="registros">Total registros disponibles: </span>
+                        <span class="registros" style="padding: 5px 15px; border: 1px solid #1e458d; margin-left: 8px; border-radius: 5px;" id="registrosDocumento"> </span>
+                    </div>
+
+                    <div class="containerInfoTime">
+                        <span>*Debes tener encuenta que el tiempo de importación puede variar entre 1 min - 15 min segun la cantidad de registros</span>
+                    </div>
+
                 </section>
-                <section class="containerPaginacionDocumentos">
+                <section class="containerPaginacionDocumentos" id="filtrosFecha">
 
                     <div style="margin-right: 30px;">
                         <label for="registroInicial">Fecha inicial*:
@@ -78,9 +93,52 @@
                         </label>
                     </div>
                 </section>
+                <section class="containerPaginacionDocumentos" id="filtrosNumero">
+
+                    <div style="margin-right: 30px;">
+                        <label for="numeroInicial">Número inicial*:
+                        <input type="number" name="numeroInicial" id="numeroInicial" min="1" value="">
+                        </label>
+                    </div>
+                    <div >
+                        <label for="numeroFinal">Número final*:
+                        <input type="number" name="numeroFinal" id="numeroFinal" min="1" value="">
+                        </label>
+                    </div>
+                </section>
+                <section class="containerPaginacionDocumentos" id="filtrosPrefijo">
+
+                    <div style="margin-right: 30px;">
+                        <label for="prefijo">Prefijo*:
+                        <input type="text" name="prefijo" id="prefijo" value="">
+                        </label>
+                    </div>
+                </section>
+                <section class="containerPaginacionDocumentos" style="display: flex !important;" id="filtrosTercero">
+                    <div style="margin-right: 30px; display: inline-flex;">
+                        <label style="color: #5a5a5a; margin-right: 15px;" for="tipoTercero">Tipo tercero*: </label>
+                        <select name="tipoTercero" id="tipoTercero" class="opcionDocumento" style="width: 250px !important;">
+                            <option value="" disabled selected>Selecciona</option>
+                            <option value="empresa">Empresa</option>
+                            <option value="cliente">Cliente</option>
+                            <option value="vendedor">Vendedor</option>
+                        </select>
+                    </div>
+                    <div style="display: inline-flex;">
+                        <label for="tercero">Nombre*:
+                        <input type="text" name="tercero" id="tercero" value="" style="width: 250px;">
+                        </label>
+                    </div>
+                    
+                </section>
                 <section>
                     <div class="mensajeErrorDocumento">
-                        <span>Por favor, completa los campos para requeridos para continuar</span>
+                        <span>Por favor, completa los campos requeridos para continuar</span>
+                    </div>
+                </section>
+                <section style="width: 100%;">
+                    <div class="infoFiltrosAdicionales" id="infoFiltrosAdicionales">
+                        <span>*Debes tener encuenta que la cantidad maxima para este tipo de consulta son 5000 registros</span>
                     </div>
                 </section>
 
@@ -116,12 +174,29 @@
             <script>
 
                     var contenedorGlobal = document.querySelector('.containerCatalogoBaseDocumentos');
-                    var contenedorFiltroFecha = document.querySelector('.containerPaginacionDocumentos');
+                    var containerInfoFiltroAdicional = document.getElementById('infoFiltrosAdicionales');
+                    var contenedorFiltroFecha = document.getElementById("filtrosFecha");
+                    var contenedorFiltroNumero = document.getElementById("filtrosNumero");
+                    var contenedorFiltroPrefijo = document.getElementById("filtrosPrefijo");
+                    var contenedorFiltroTercero = document.getElementById("filtrosTercero");
+                    var containerInfoTime = document.querySelector('.containerInfoTime');
                     var contenedorOpciones = document.querySelector('.containerOpcionesImportacion');
                     var buttonFiltros = document.querySelector('.btnFiltroFecha');
+                    var containerBtnAll = document.querySelector(".optionAllMore");
+                    var btnFecha = document.getElementById('btnFecha');
+                    var btnNumero = document.getElementById('btnNumero');
+                    var btnPrefijo = document.getElementById('btnPrefijo');
+                    var btnTercero = document.getElementById('btnTercero');
                     var contenedorLoading = document.querySelector('.loading');
                     var selectDocument = document.getElementById("tipoDocumento");
+                    var selectTipoTercero = document.getElementById("tipoTercero");
                     var registrosDocumento = document.getElementById("registrosDocumento");
+                    var registroInicial = document.getElementById('registroInicial');
+                    var registroFinal = document.getElementById('registroFinal');
+                    var numeroInicial = document.getElementById('numeroInicial');
+                    var numeroFinal = document.getElementById('numeroFinal');
+                    var prefijoSelect = document.getElementById('prefijo');
+                    var terceroSelect = document.getElementById('tercero');
                     var mensajeValidacionRegistros = document.querySelector(".mensajeErrorInicial");
                     var totalImportacion = document.querySelector('.containerTotalRegistros');
                     var buttonImportar = document.querySelector('.buttonImport');
@@ -133,7 +208,11 @@
                     
                     contenedorGlobal.style.display = 'flex';
                     contenedorFiltroFecha.style.display = 'none';
+                    contenedorFiltroNumero.style.display = 'none';
+                    contenedorFiltroPrefijo.style.display = 'none';
+                    contenedorFiltroTercero.style.display = 'none';
                     contenedorOpciones.style.display = 'none';
+                    containerInfoFiltroAdicional.style.display = 'none';
 
                     var encabezados = ['Id', 'Fecha', 'Prefijo', 'Número', 'Empresa', 'Cliente', 'Vendedor', 'Forma de Pago', 'Concepto'];
                     var datos = ['1', '2024-01-12', 'DVVP','42158', 'Compañia Electrodomesticos SAS', 'Company LTDA', 'William Diaz', 'Crédito', 'Factura de venta'];
@@ -171,15 +250,18 @@
 
     
                     function guardarSeleccion() {
-                        var registroInicial = document.getElementById('registroInicial');
-                        var registroFinal = document.getElementById('registroFinal');
 
-
-                        if((registroInicial.value && registroFinal.value && selectDocument.value) || (selectDocument.value && allRegistros)){
+                        if((registroInicial.value && registroFinal.value && selectDocument.value) || (selectDocument.value && allRegistros) || (numeroInicial.value && numeroFinal.value && selectDocument.value) || (prefijoSelect.value && selectDocument.value) || (terceroSelect.value && selectTipoTercero.value && selectDocument.value)){
                             mensajeError.style.display = 'none';
                             var seleccionPaginado = {
-                                registroInicial: registroInicial.value,
-                                registroFinal: registroFinal.value,
+                                tipoDocumento: selectDocument.value,
+                                registroInicial: registroInicial.value ? registroInicial.value : null,
+                                registroFinal: registroFinal.value ? registroFinal.value : null,
+                                numeroInicial: numeroInicial.value ? numeroInicial.value : null,
+                                numeroFinal: numeroFinal.value ? numeroFinal.value : null,
+                                prefijo: prefijoSelect.value ? prefijoSelect.value : null,
+                                terceroTipo: selectTipoTercero.value ? selectTipoTercero.value : null,
+                                tercero: terceroSelect.value ? terceroSelect.value : null,
                             };
                             console.log(seleccionPaginado);
                             google.script.run.guardarSeleccionPaginadoDocumentos(seleccionPaginado);
@@ -193,29 +275,41 @@
                     selectDocument.addEventListener('change', function() {
     
                         console.log(this.value,'this.value');
-                        if (!selectDocument.value) {
+                        if (!selectDocument.value || selectDocument.value == null) {
                             mensajeError.style.display = 'block';
                         }else{
                             seleccionPaginado.tipoDocumento = selectDocument.value;
                             mensajeError.style.display = 'none';
-                            mensajeValidacionRegistros.style.display = 'block';
+                            registroInicial.value = null;
+                            registroFinal.value = null;
+                            numeroInicial.value = null;
+                            numeroFinal.value = null;
+                            prefijoSelect.value = null;
+                            terceroSelect.value = null;
+                            selectTipoTercero.value = null;
+                            // mensajeValidacionRegistros.style.display = 'block';
                             google.script.run.withSuccessHandler(function() {
-                            google.script.run.withSuccessHandler(function() {
-                                google.script.run.withSuccessHandler(function(result) {
-                                    console.log(result,'result');
-                                    mensajeValidacionRegistros.style.display = 'none';
-                                    registrosDocumento.textContent = result;
-                                    totalImportacion.style.display = 'inline-flex';
-                                    contenedorOpciones.style.display = 'flex';
-                                    estadoRegistros = true;
-                                }).getDataTotalRegistros();
-                                }).validacionInicial();
+                            // google.script.run.withSuccessHandler(function() {
+                            //     google.script.run.withSuccessHandler(function(result) {
+                            //         console.log(result,'result');
+                            //         mensajeValidacionRegistros.style.display = 'none';
+                            //         registrosDocumento.textContent = result;
+                            //         totalImportacion.style.display = 'inline-flex';
+                                       contenedorOpciones.style.display = 'flex';
+                            //         estadoRegistros = true;
+                            //     }).getDataTotalRegistros();
+                            //     }).validacionInicial();
                             }).guardarSeleccionPaginadoDocumentos(seleccionPaginado);
                         }
                     });
                     
                     registroInicial.onchange = guardarSeleccion;
                     registroFinal.onchange = guardarSeleccion;
+                    numeroInicial.onchange = guardarSeleccion;
+                    numeroFinal.onchange = guardarSeleccion;
+                    prefijo.onchange = guardarSeleccion;
+                    tercero.onchange = guardarSeleccion;
+                    selectTipoTercero.onchange = guardarSeleccion;
                     selectDocument.onchange = guardarSeleccion;
                     selectAll.onchange = guardarSeleccion;
 
@@ -223,9 +317,94 @@
 
                         if (contenedorFiltroFecha.style.display === 'none') {
                             contenedorFiltroFecha.style.display = 'inline-flex';
+                            btnFecha.classList.add('btnFiltroActive');
+                            btnNumero.disabled = true;
+                            btnPrefijo.disabled = true;
+                            btnTercero.disabled = true;
+                            containerBtnAll.style.display = 'none';
+                            containerInfoFiltroAdicional.style.display = 'block';
                         }
                         else {
                             contenedorFiltroFecha.style.display = 'none';
+                            containerInfoFiltroAdicional.style.display = 'none';
+                            btnFecha.classList.remove('btnFiltroActive');
+                            registroInicial.value = null;
+                            registroFinal.value = null;
+                            containerBtnAll.style.display = 'inline-flex';
+                            btnNumero.disabled = false;
+                            btnPrefijo.disabled = false;
+                            btnTercero.disabled = false;
+                        }
+                    }
+
+                    function activarFiltrosNumero() {
+
+                        if (contenedorFiltroNumero.style.display === 'none') {
+                            contenedorFiltroNumero.style.display = 'inline-flex';
+                            containerInfoFiltroAdicional.style.display = 'block';
+                            btnNumero.classList.add('btnFiltroActive');
+                            btnFecha.disabled = true;
+                            btnPrefijo.disabled = true;
+                            btnTercero.disabled = true;
+                            containerBtnAll.style.display = 'none';
+                        }
+                        else {
+                            contenedorFiltroNumero.style.display = 'none';
+                            containerInfoFiltroAdicional.style.display = 'none';
+                            btnNumero.classList.remove('btnFiltroActive');
+                            numeroInicial.value = null;
+                            numeroFinal.value = null;
+                            containerBtnAll.style.display = 'inline-flex';
+                            btnFecha.disabled = false;
+                            btnPrefijo.disabled = false;
+                            btnTercero.disabled = false;
+                        }
+                    }
+
+                    function activarFiltrosPrefijo() {
+
+                        if (contenedorFiltroPrefijo.style.display === 'none') {
+                            contenedorFiltroPrefijo.style.display = 'inline-flex';
+                            containerInfoFiltroAdicional.style.display = 'block';
+                            btnPrefijo.classList.add('btnFiltroActive');
+                            btnNumero.disabled = true;
+                            btnFecha.disabled = true;
+                            btnTercero.disabled = true;
+                            containerBtnAll.style.display = 'none';
+                        }
+                        else {
+                            contenedorFiltroPrefijo.style.display = 'none';
+                            containerInfoFiltroAdicional.style.display = 'none';
+                            btnPrefijo.classList.remove('btnFiltroActive');
+                            prefijoSelect.value = null;
+                            containerBtnAll.style.display = 'inline-flex';
+                            btnNumero.disabled = false;
+                            btnFecha.disabled = false;
+                            btnTercero.disabled = false;
+                        }
+                    }
+
+                    function activarFiltrosTercero() {
+
+                        if (contenedorFiltroTercero.style.display === 'none') {
+                            contenedorFiltroTercero.style.display = 'inline-flex';
+                            containerInfoFiltroAdicional.style.display = 'block';
+                            btnTercero.classList.add('btnFiltroActive');
+                            btnNumero.disabled = true;
+                            btnFecha.disabled = true;
+                            btnPrefijo.disabled = true;
+                            containerBtnAll.style.display = 'none';
+                        }
+                        else {
+                            contenedorFiltroTercero.style.display = 'none';
+                            containerInfoFiltroAdicional.style.display = 'none';
+                            btnTercero.classList.remove('btnFiltroActive');
+                            terceroSelect.value = null;
+                            selectTipoTercero.value = null;
+                            containerBtnAll.style.display = 'inline-flex';
+                            btnNumero.disabled = false;
+                            btnFecha.disabled = false;
+                            btnPrefijo.disabled = false;
                         }
                     }
 
@@ -233,13 +412,34 @@
                         console.log(e.target.checked,'e.target.checked');
                         mensajeError.style.display = 'none';
                         if (e.target.checked) {
-                            contenedorFiltroFecha.style.display = 'none';
-                            buttonFiltros.style.display = 'none';
+                            mensajeValidacionRegistros.style.display = 'block';
+                            // contenedorFiltroFecha.style.display = 'none';
+                            // buttonFiltros.style.display = 'none';
+                            btnFecha.disabled = true;
+                            btnNumero.disabled = true;
+                            btnPrefijo.disabled = true;
+                            btnTercero.disabled = true;
                             seleccionPaginado.registrosCompletos = true;
                             google.script.run.guardarSeleccionPaginadoDocumentos(seleccionPaginado);
                             allRegistros = true;
+                            google.script.run.withSuccessHandler(function() {
+                                google.script.run.withSuccessHandler(function(result) {
+                                    console.log(result,'result');
+                                    mensajeValidacionRegistros.style.display = 'none';
+                                    registrosDocumento.textContent = result;
+                                    totalImportacion.style.display = 'flex';
+                                    containerInfoTime.style.display = 'inline-flex';
+                                    estadoRegistros = true;
+                                }).getDataTotalRegistros();
+                            }).validacionInicial();
                         } else {
-                            buttonFiltros.style.display = 'block';
+                            // buttonFiltros.style.display = 'block';
+                            totalImportacion.style.display = 'none';
+                            containerInfoTime.style.display = 'none';
+                            btnFecha.disabled = false;
+                            btnNumero.disabled = false;
+                            btnPrefijo.disabled = false;
+                            btnTercero.disabled = false;
                             seleccionPaginado.regitrosCompletos = null;
                             google.script.run.guardarSeleccionPaginadoDocumentos(seleccionPaginado);
                             allRegistros = null;

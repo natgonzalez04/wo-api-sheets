@@ -24,16 +24,130 @@ function guardarSeleccionPaginadoDocumentosCompra(seleccion) {
     PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', seleccionPaginadoDoc);
 }
 
+function validacionInicialCompra(){
+    var tipoDocumentoSeleccionado = PropertiesService.getDocumentProperties().getProperty('seleccionPaginadoDocumentosCompra');
+    var datosSelect = JSON.parse(tipoDocumentoSeleccionado);
+    Logger.log(datosSelect.tipoDocumento);
+    if(datosSelect != null){
+        var claveAPI = almacenamientoClave();
+
+        var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+
+        var payloadInicial = {
+            "columnaOrdenar": "id",
+            "pagina": 0,
+            "registrosPorPagina": 1,
+            "orden": "DESC",
+            "filtros": [
+                {
+                    "atributo": "documentoTipo.codigoDocumento",
+                    "valor": datosSelect.tipoDocumento,
+                    "valor2": null,
+                    "tipoFiltro": 0,
+                    "tipoDato": 0,
+                    "nombreColumna": null,
+                    "valores": null,
+                    "clase": null,
+                    "operador": 0,
+                    "subGrupo": "filtro"
+                }
+            ],
+            "canal": 0,
+            "registroInicial": 0
+        };
+
+        var headers = {
+            'Content-Type': 'application/json',
+            'Authorization': claveAPI,
+        };
+
+        var options = {
+            'method': 'post',
+            'headers': headers,
+            'payload': JSON.stringify(payloadInicial),
+            'muteHttpExceptions': true
+        };
+
+        var response = UrlFetchApp.fetch(apiUrl, options);
+        Logger.log(response);
+        Logger.log(response.length);
+        if (response.getResponseCode() === 200) {
+            var responseData = response.getContentText();
+            var jsonData = JSON.parse(responseData);
+            var totalRegistros = jsonData.data.totalElements;
+            Logger.log(totalRegistros);
+            var scriptPropertiesTotalRegistros = PropertiesService.getScriptProperties();
+            scriptPropertiesTotalRegistros.setProperty('contentTotalRegistrosCompra', JSON.stringify(totalRegistros));
+        }
+    }
+
+}
+
+function getDataTotalRegistrosCompra() {
+    var scriptProperties = PropertiesService.getScriptProperties();
+    var contentDataTotalRegistros = scriptProperties.getProperty('contentTotalRegistrosCompra');
+    return JSON.parse(contentDataTotalRegistros);
+}
+
 function mostraDocumentosCompra(){
     var datosString = PropertiesService.getDocumentProperties().getProperty('seleccionPaginadoDocumentosCompra');
     var datos = JSON.parse(datosString);
-    Logger.log(datos.registroInicial);
+    Logger.log(datos);
+    var tipoDoc = datos.tipoDocumento;
+    var totalRegistros = getDataTotalRegistrosCompra();
+    Logger.log(totalRegistros);
+    var paginas = totalRegistros >= 2000 ? Math.ceil(totalRegistros / 2000) : 1;
+    var pag = 0;
+    var procesoTerminado = false;
+    var fechaInicial = datos.registroInicial;
+    var fechaFin = datos.registroFinal;
+    var numeroInicial = datos.numeroInicial;
+    var numeroFinal = datos.numeroFinal;
+    var prefijoSelect = datos.prefijo;
+    var tercero = datos.tercero;
+    var tipoTercero = datos.terceroTipo;
+    
+    if(datos.registrosCompletos == true){
+        for (var i = 0; i < paginas; i++) {
+            var datoInicial = i * 2000;
+            listarRegistroCompletosCompra(tipoDoc, datoInicial,pag)
+            pag++;
+            if (pag == paginas) {
+                procesoTerminado = true;
+                break;
+            }
+        }
+    }else if(datos.registroInicial && datos.registroFinal){
+        listarRegistroFechaCompra(tipoDoc, fechaInicial, fechaFin);
+        procesoTerminado = true;
+    }else if(datos.numeroInicial && datos.numeroFinal){
+        listarRegistroNumeroCompra(tipoDoc, numeroInicial, numeroFinal);
+        procesoTerminado = true;
+    }else if(datos.prefijo){
+        listarRegistroPrefijoCompra(tipoDoc, prefijoSelect);
+        procesoTerminado = true;
+    }else if(datos.tercero && tipoTercero == 'empresa'){
+        listarRegistroTerceroEmpresaCompra(tipoDoc, tercero);
+        procesoTerminado = true;
+    }else if(datos.tercero && tipoTercero == 'proveedor'){
+        listarRegistroTerceroProveedor(tipoDoc, tercero);
+        procesoTerminado = true;
+    }else if(datos.tercero && tipoTercero == 'comprador'){
+        listarRegistroTerceroComprador(tipoDoc, tercero);
+        procesoTerminado = true;
+    }
+    
+
+    return procesoTerminado;
+}
+
+function listarRegistroCompletosCompra(documento, inicial, pagina){
 
     var claveAPI = almacenamientoClave();
-    
+
     var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
 
-    var payloadFC = {
+    var payloadFV = {
         "columnaOrdenar": "fecha,id",
         "pagina": 0,
         "registrosPorPagina": 2000,
@@ -41,7 +155,7 @@ function mostraDocumentosCompra(){
         "filtros": [
             {
                 "atributo": "documentoTipo.codigoDocumento",
-                "valor": datos.tipoDocumento,
+                "valor": documento,
                 "valor2": null,
                 "tipoFiltro": 0,
                 "tipoDato": 0,
@@ -50,37 +164,30 @@ function mostraDocumentosCompra(){
                 "clase": null,
                 "operador": 0,
                 "subGrupo": "filtro"
-            },
-            {
-                "atributo": "fecha",
-                "tipoDato": 3,
-                "nombreColumna": "Fecha",
-                "tipoFiltro": 8,
-                "valor": datos.registroInicial,
-                "valor2": datos.registroFinal,
-                "operador": 0
             }
         ],
         "canal": 0,
-        "registroInicial": 0
+        "registroInicial": inicial
     };
 
-    
+
     var headers = {
         'Content-Type': 'application/json',
         'Authorization': claveAPI,
     };
-    
+
     var options = {
         'method': 'post',
         'headers': headers,
-        'payload': JSON.stringify(payloadFC),
+        'payload': JSON.stringify(payloadFV),
         'muteHttpExceptions': true
     };
-    
+
     var response = UrlFetchApp.fetch(apiUrl, options);
     Logger.log(response);
     Logger.log(response.length);
+
+    var registrosContador = pagina * 2000;
 
     if (response.getResponseCode() === 200) {
         var responseData = response.getContentText();
@@ -88,8 +195,14 @@ function mostraDocumentosCompra(){
         var content = jsonData.data.content;
         Logger.log(content.length);
         var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-        var celdaActiva = hojaActiva.getActiveCell();
-        
+        var celdaActiva;
+
+        if (pagina >= 1) {
+            celdaActiva = hojaActiva.getActiveCell().offset(registrosContador + 1, 0);
+        } else {
+            celdaActiva = hojaActiva.getActiveCell();
+        }
+
         var keys = {
             "id": "Id",
             "fecha": "Fecha",
@@ -112,82 +225,754 @@ function mostraDocumentosCompra(){
         for (var i = 0; i < content.length; i++) {
             j = 0;
             for (var key in keys) {
-                var cell = celdaActiva.offset(i + 1, j);  
+                var cell = celdaActiva.offset(i + 1, j);
                 if(key == 'id'){
                     cell.setValue(String(content[i][key]));
                 }else{
-                    cell.setValue(content[i][key]); 
+                    cell.setValue(content[i][key]);
                 }
                 j++;
             }
         }
-        PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentos', '');
+
+        PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
     } else {
-        PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentos', '');
+        PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
         var errorResponse = response.getResponseCode();
         Logger.log("Error response: " + errorResponse);
-        mapeoErroresDocumentoCompra(errorResponse);
+        mapeoErroresDocumento(errorResponse);
     }
-
-
 }
 
-function pruebaCompra(){
+function listarRegistroFechaCompra(documento, fechaInicial, fechaFin){
     var claveAPI = almacenamientoClave();
-    
+
     var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
-
-    var payloadFC = {
-        "columnaOrdenar": "fecha,id",
-        "pagina": 0,
-        "registrosPorPagina": 2000,
-        "orden": "DESC",
-        "filtros": [
-            {
-                "atributo": "documentoTipo.codigoDocumento",
-                "valor": "NDC",
-                "valor2": null,
-                "tipoFiltro": 0,
-                "tipoDato": 0,
-                "nombreColumna": null,
-                "valores": null,
-                "clase": null,
-                "operador": 0,
-                "subGrupo": "filtro"
-            },
-            {
-                "atributo": "fecha",
-                "tipoDato": 3,
-                "nombreColumna": "Fecha",
-                "tipoFiltro": 8,
-                "valor":"2024-02-09",
-                "valor2": "2024-02-10",
-                "operador": 0
+    
+    var payloadDoc = {
+            "columnaOrdenar": "fecha,id",
+            "pagina": 0,
+            "registrosPorPagina": 5000,
+            "orden": "DESC",
+            "filtros": [
+                {
+                    "atributo": "documentoTipo.codigoDocumento",
+                    "valor": documento,
+                    "valor2": null,
+                    "tipoFiltro": 0,
+                    "tipoDato": 0,
+                    "nombreColumna": null,
+                    "valores": null,
+                    "clase": null,
+                    "operador": 0,
+                    "subGrupo": "filtro"
+                },
+                {
+                    "atributo": "fecha",
+                    "tipoDato": 3,
+                    "nombreColumna": "Fecha",
+                    "tipoFiltro": 8,
+                    "valor": fechaInicial,
+                    "valor2": fechaFin,
+                    "operador": 0
+                }
+            ],
+            "canal": 0,
+            "registroInicial": 0
+        };
+    
+    
+        var headers = {
+            'Content-Type': 'application/json',
+            'Authorization': claveAPI,
+        };
+    
+        var options = {
+            'method': 'post',
+            'headers': headers,
+            'payload': JSON.stringify(payloadDoc),
+            'muteHttpExceptions': true
+        };
+    
+        var response = UrlFetchApp.fetch(apiUrl, options);
+        Logger.log(response);
+        Logger.log(response.length);
+    
+        if (response.getResponseCode() === 200) {
+            var responseData = response.getContentText();
+            var jsonData = JSON.parse(responseData);
+            var content = jsonData.data.content;
+            Logger.log(content.length);
+            var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+            var celdaActiva = hojaActiva.getActiveCell();
+    
+            var keys = {
+                "id": "Id",
+                "fecha": "Fecha",
+                "prefijo": "Prefijo",
+                "numero": "Número",
+                "empresa": "Empresa",
+                "terceroExterno": "Proveedor",
+                "terceroInterno": "Comprador",
+                "formaPago": "Forma de Pago",
+                "concepto": "Concepto",
+            };
+    
+            var j = 0;
+            for (var key in keys) {
+                var headerCell = celdaActiva.offset(0, j);
+                headerCell.setValue(keys[key]);
+                j++;
             }
-        ],
-        "canal": 0,
-        "registroInicial": 0
-    };
+    
+            for (var i = 0; i < content.length; i++) {
+                j = 0;
+                for (var key in keys) {
+                    var cell = celdaActiva.offset(i + 1, j);
+                    if(key == 'id'){
+                        cell.setValue(String(content[i][key]));
+                    }else{
+                        cell.setValue(content[i][key]);
+                    }
+                    j++;
+                }
+            }
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+        } else {
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            var errorResponse = response.getResponseCode();
+            Logger.log("Error response: " + errorResponse);
+            mapeoErroresDocumento(errorResponse);
+        }
+    
+    
+}
+
+function listarRegistroNumeroCompra(documento, numeroInicial,numeroFin){
+    var claveAPI = almacenamientoClave();
+
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+    
+    var payloadDoc = {
+            "columnaOrdenar": "fecha,id",
+            "pagina": 0,
+            "registrosPorPagina": 5000,
+            "orden": "DESC",
+            "filtros": [
+                {
+                    "atributo": "documentoTipo.codigoDocumento",
+                    "valor": documento,
+                    "valor2": null,
+                    "tipoFiltro": 0,
+                    "tipoDato": 0,
+                    "nombreColumna": null,
+                    "valores": null,
+                    "clase": null,
+                    "operador": 0,
+                    "subGrupo": "filtro"
+                },
+                {
+                    "atributo": "numero",
+                    "tipoDato": 4,
+                    "nombreColumna": "Número",
+                    "tipoFiltro": 8,
+                    "valor": numeroInicial,
+                    "valor2": numeroFin,
+                    "operador": 0
+                }
+            ],
+            "canal": 0,
+            "registroInicial": 0
+        };
+    
+    
+        var headers = {
+            'Content-Type': 'application/json',
+            'Authorization': claveAPI,
+        };
+    
+        var options = {
+            'method': 'post',
+            'headers': headers,
+            'payload': JSON.stringify(payloadDoc),
+            'muteHttpExceptions': true
+        };
+    
+        var response = UrlFetchApp.fetch(apiUrl, options);
+        Logger.log(response);
+        Logger.log(response.length);
+    
+        if (response.getResponseCode() === 200) {
+            var responseData = response.getContentText();
+            var jsonData = JSON.parse(responseData);
+            var content = jsonData.data.content;
+            Logger.log(content.length);
+            var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+            var celdaActiva = hojaActiva.getActiveCell();
+    
+            var keys = {
+                "id": "Id",
+                "fecha": "Fecha",
+                "prefijo": "Prefijo",
+                "numero": "Número",
+                "empresa": "Empresa",
+                "terceroExterno": "Proveedor",
+                "terceroInterno": "Comprador",
+                "formaPago": "Forma de Pago",
+                "concepto": "Concepto",
+            };
+    
+            var j = 0;
+            for (var key in keys) {
+                var headerCell = celdaActiva.offset(0, j);
+                headerCell.setValue(keys[key]);
+                j++;
+            }
+    
+            for (var i = 0; i < content.length; i++) {
+                j = 0;
+                for (var key in keys) {
+                    var cell = celdaActiva.offset(i + 1, j);
+                    if(key == 'id'){
+                        cell.setValue(String(content[i][key]));
+                    }else{
+                        cell.setValue(content[i][key]);
+                    }
+                    j++;
+                }
+            }
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+        } else {
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            var errorResponse = response.getResponseCode();
+            Logger.log("Error response: " + errorResponse);
+            mapeoErroresDocumento(errorResponse);
+        }
+    
+    
+}
+
+function listarRegistroPrefijoCompra(documento, prefijo){
+    var claveAPI = almacenamientoClave();
+
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+    
+    var payloadDoc = {
+            "columnaOrdenar": "fecha,id",
+            "pagina": 0,
+            "registrosPorPagina": 5000,
+            "orden": "DESC",
+            "filtros": [
+                {
+                    "atributo": "documentoTipo.codigoDocumento",
+                    "valor": documento,
+                    "valor2": null,
+                    "tipoFiltro": 0,
+                    "tipoDato": 0,
+                    "nombreColumna": null,
+                    "valores": null,
+                    "clase": null,
+                    "operador": 0,
+                    "subGrupo": "filtro"
+                },
+                {
+                    "atributo": "prefijo.nombre",
+                    "tipoDato": 0,
+                    "nombreColumna": "Prefijo",
+                    "tipoFiltro": 1,
+                    "valor": prefijo,
+                    "operador": 0
+                },
+            ],
+            "canal": 0,
+            "registroInicial": 0
+        };
+    
+    
+        var headers = {
+            'Content-Type': 'application/json',
+            'Authorization': claveAPI,
+        };
+    
+        var options = {
+            'method': 'post',
+            'headers': headers,
+            'payload': JSON.stringify(payloadDoc),
+            'muteHttpExceptions': true
+        };
+    
+        var response = UrlFetchApp.fetch(apiUrl, options);
+        Logger.log(response);
+        Logger.log(response.length);
+    
+        if (response.getResponseCode() === 200) {
+            var responseData = response.getContentText();
+            var jsonData = JSON.parse(responseData);
+            var content = jsonData.data.content;
+            Logger.log(content.length);
+            var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+            var celdaActiva = hojaActiva.getActiveCell();
+    
+            var keys = {
+                "id": "Id",
+                "fecha": "Fecha",
+                "prefijo": "Prefijo",
+                "numero": "Número",
+                "empresa": "Empresa",
+                "terceroExterno": "Proveedor",
+                "terceroInterno": "Comprador",
+                "formaPago": "Forma de Pago",
+                "concepto": "Concepto",
+            };
+    
+            var j = 0;
+            for (var key in keys) {
+                var headerCell = celdaActiva.offset(0, j);
+                headerCell.setValue(keys[key]);
+                j++;
+            }
+    
+            for (var i = 0; i < content.length; i++) {
+                j = 0;
+                for (var key in keys) {
+                    var cell = celdaActiva.offset(i + 1, j);
+                    if(key == 'id'){
+                        cell.setValue(String(content[i][key]));
+                    }else{
+                        cell.setValue(content[i][key]);
+                    }
+                    j++;
+                }
+            }
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+        } else {
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            var errorResponse = response.getResponseCode();
+            Logger.log("Error response: " + errorResponse);
+            mapeoErroresDocumento(errorResponse);
+        }
+    
+    
+}
+
+function listarRegistroTerceroEmpresaCompra(documento, empresa){
+    var claveAPI = almacenamientoClave();
+
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+    
+    var payloadDoc = {
+            "columnaOrdenar": "fecha,id",
+            "pagina": 0,
+            "registrosPorPagina": 5000,
+            "orden": "DESC",
+            "filtros": [
+                {
+                    "atributo": "documentoTipo.codigoDocumento",
+                    "valor": documento,
+                    "valor2": null,
+                    "tipoFiltro": 0,
+                    "tipoDato": 0,
+                    "nombreColumna": null,
+                    "valores": null,
+                    "clase": null,
+                    "operador": 0,
+                    "subGrupo": "filtro"
+                },
+                {
+                    "atributo": "empresa.nombre",
+                    "tipoDato": 0,
+                    "nombreColumna": "Empresa",
+                    "tipoFiltro": 1,
+                    "valor": empresa,
+                    "operador": 0
+                }
+            ],
+            "canal": 0,
+            "registroInicial": 0
+        };
+    
+    
+        var headers = {
+            'Content-Type': 'application/json',
+            'Authorization': claveAPI,
+        };
+    
+        var options = {
+            'method': 'post',
+            'headers': headers,
+            'payload': JSON.stringify(payloadDoc),
+            'muteHttpExceptions': true
+        };
+    
+        var response = UrlFetchApp.fetch(apiUrl, options);
+        Logger.log(response);
+        Logger.log(response.length);
+    
+        if (response.getResponseCode() === 200) {
+            var responseData = response.getContentText();
+            var jsonData = JSON.parse(responseData);
+            var content = jsonData.data.content;
+            Logger.log(content.length);
+            var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+            var celdaActiva = hojaActiva.getActiveCell();
+    
+            var keys = {
+                "id": "Id",
+                "fecha": "Fecha",
+                "prefijo": "Prefijo",
+                "numero": "Número",
+                "empresa": "Empresa",
+                "terceroExterno": "Proveedor",
+                "terceroInterno": "Comprador",
+                "formaPago": "Forma de Pago",
+                "concepto": "Concepto",
+            };
+    
+            var j = 0;
+            for (var key in keys) {
+                var headerCell = celdaActiva.offset(0, j);
+                headerCell.setValue(keys[key]);
+                j++;
+            }
+    
+            for (var i = 0; i < content.length; i++) {
+                j = 0;
+                for (var key in keys) {
+                    var cell = celdaActiva.offset(i + 1, j);
+                    if(key == 'id'){
+                        cell.setValue(String(content[i][key]));
+                    }else{
+                        cell.setValue(content[i][key]);
+                    }
+                    j++;
+                }
+            }
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+        } else {
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            var errorResponse = response.getResponseCode();
+            Logger.log("Error response: " + errorResponse);
+            mapeoErroresDocumento(errorResponse);
+        }
+    
+    
+}
+
+function listarRegistroTerceroProveedor(documento, proveedor){
+    var claveAPI = almacenamientoClave();
+
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+    
+    var payloadDoc = {
+            "columnaOrdenar": "fecha,id",
+            "pagina": 0,
+            "registrosPorPagina": 5000,
+            "orden": "DESC",
+            "filtros": [
+                {
+                    "atributo": "documentoTipo.codigoDocumento",
+                    "valor": documento,
+                    "valor2": null,
+                    "tipoFiltro": 0,
+                    "tipoDato": 0,
+                    "nombreColumna": null,
+                    "valores": null,
+                    "clase": null,
+                    "operador": 0,
+                    "subGrupo": "filtro"
+                },
+                {
+                    "atributo": "terceroExterno.nombreCompleto",
+                    "tipoDato": 0,
+                    "nombreColumna": "Proveedor",
+                    "tipoFiltro": 1,
+                    "valor": proveedor,
+                    "operador": 0
+                },
+            ],
+            "canal": 0,
+            "registroInicial": 0
+        };
+    
+    
+        var headers = {
+            'Content-Type': 'application/json',
+            'Authorization': claveAPI,
+        };
+    
+        var options = {
+            'method': 'post',
+            'headers': headers,
+            'payload': JSON.stringify(payloadDoc),
+            'muteHttpExceptions': true
+        };
+    
+        var response = UrlFetchApp.fetch(apiUrl, options);
+        Logger.log(response);
+        Logger.log(response.length);
+    
+        if (response.getResponseCode() === 200) {
+            var responseData = response.getContentText();
+            var jsonData = JSON.parse(responseData);
+            var content = jsonData.data.content;
+            Logger.log(content.length);
+            var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+            var celdaActiva = hojaActiva.getActiveCell();
+    
+            var keys = {
+                "id": "Id",
+                "fecha": "Fecha",
+                "prefijo": "Prefijo",
+                "numero": "Número",
+                "empresa": "Empresa",
+                "terceroExterno": "Proveedor",
+                "terceroInterno": "Comprador",
+                "formaPago": "Forma de Pago",
+                "concepto": "Concepto",
+            };
+    
+            var j = 0;
+            for (var key in keys) {
+                var headerCell = celdaActiva.offset(0, j);
+                headerCell.setValue(keys[key]);
+                j++;
+            }
+    
+            for (var i = 0; i < content.length; i++) {
+                j = 0;
+                for (var key in keys) {
+                    var cell = celdaActiva.offset(i + 1, j);
+                    if(key == 'id'){
+                        cell.setValue(String(content[i][key]));
+                    }else{
+                        cell.setValue(content[i][key]);
+                    }
+                    j++;
+                }
+            }
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+        } else {
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            var errorResponse = response.getResponseCode();
+            Logger.log("Error response: " + errorResponse);
+            mapeoErroresDocumento(errorResponse);
+        }
+    
+    
+}
+
+function listarRegistroTerceroComprador(documento, comprador){
+    var claveAPI = almacenamientoClave();
+
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+    
+    var payloadDoc = {
+            "columnaOrdenar": "fecha,id",
+            "pagina": 0,
+            "registrosPorPagina": 5000,
+            "orden": "DESC",
+            "filtros": [
+                {
+                    "atributo": "documentoTipo.codigoDocumento",
+                    "valor": documento,
+                    "valor2": null,
+                    "tipoFiltro": 0,
+                    "tipoDato": 0,
+                    "nombreColumna": null,
+                    "valores": null,
+                    "clase": null,
+                    "operador": 0,
+                    "subGrupo": "filtro"
+                },
+                {
+                    "atributo": "terceroInterno.nombreCompleto",
+                    "tipoDato": 0,
+                    "nombreColumna": "Comprador",
+                    "tipoFiltro": 1,
+                    "valor": comprador,
+                    "operador": 0
+                },
+            ],
+            "canal": 0,
+            "registroInicial": 0
+        };
+    
+    
+        var headers = {
+            'Content-Type': 'application/json',
+            'Authorization': claveAPI,
+        };
+    
+        var options = {
+            'method': 'post',
+            'headers': headers,
+            'payload': JSON.stringify(payloadDoc),
+            'muteHttpExceptions': true
+        };
+    
+        var response = UrlFetchApp.fetch(apiUrl, options);
+        Logger.log(response);
+        Logger.log(response.length);
+    
+        if (response.getResponseCode() === 200) {
+            var responseData = response.getContentText();
+            var jsonData = JSON.parse(responseData);
+            var content = jsonData.data.content;
+            Logger.log(content.length);
+            var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+            var celdaActiva = hojaActiva.getActiveCell();
+    
+            var keys = {
+                "id": "Id",
+                "fecha": "Fecha",
+                "prefijo": "Prefijo",
+                "numero": "Número",
+                "empresa": "Empresa",
+                "terceroExterno": "Proveedor",
+                "terceroInterno": "Comprador",
+                "formaPago": "Forma de Pago",
+                "concepto": "Concepto",
+            };
+    
+            var j = 0;
+            for (var key in keys) {
+                var headerCell = celdaActiva.offset(0, j);
+                headerCell.setValue(keys[key]);
+                j++;
+            }
+    
+            for (var i = 0; i < content.length; i++) {
+                j = 0;
+                for (var key in keys) {
+                    var cell = celdaActiva.offset(i + 1, j);
+                    if(key == 'id'){
+                        cell.setValue(String(content[i][key]));
+                    }else{
+                        cell.setValue(content[i][key]);
+                    }
+                    j++;
+                }
+            }
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+        } else {
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            var errorResponse = response.getResponseCode();
+            Logger.log("Error response: " + errorResponse);
+            mapeoErroresDocumento(errorResponse);
+        }
+    
+    
+}
+
+// function mostraDocumentosCompra(){
+//     var datosString = PropertiesService.getDocumentProperties().getProperty('seleccionPaginadoDocumentosCompra');
+//     var datos = JSON.parse(datosString);
+//     Logger.log(datos.registroInicial);
+
+//     var claveAPI = almacenamientoClave();
+    
+//     var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+
+//     var payloadFC = {
+//         "columnaOrdenar": "fecha,id",
+//         "pagina": 0,
+//         "registrosPorPagina": 2000,
+//         "orden": "DESC",
+//         "filtros": [
+//             {
+//                 "atributo": "documentoTipo.codigoDocumento",
+//                 "valor": datos.tipoDocumento,
+//                 "valor2": null,
+//                 "tipoFiltro": 0,
+//                 "tipoDato": 0,
+//                 "nombreColumna": null,
+//                 "valores": null,
+//                 "clase": null,
+//                 "operador": 0,
+//                 "subGrupo": "filtro"
+//             },
+//             {
+//                 "atributo": "fecha",
+//                 "tipoDato": 3,
+//                 "nombreColumna": "Fecha",
+//                 "tipoFiltro": 8,
+//                 "valor": datos.registroInicial,
+//                 "valor2": datos.registroFinal,
+//                 "operador": 0
+//             }
+//         ],
+//         "canal": 0,
+//         "registroInicial": 0
+//     };
 
     
-    var headers = {
-        'Content-Type': 'application/json',
-        'Authorization': claveAPI,
-    };
+//     var headers = {
+//         'Content-Type': 'application/json',
+//         'Authorization': claveAPI,
+//     };
     
-    var options = {
-        'method': 'post',
-        'headers': headers,
-        'payload': JSON.stringify(payloadFC),
-        'muteHttpExceptions': true
-    };
+//     var options = {
+//         'method': 'post',
+//         'headers': headers,
+//         'payload': JSON.stringify(payloadFC),
+//         'muteHttpExceptions': true
+//     };
     
-    var response = UrlFetchApp.fetch(apiUrl, options);
-    Logger.log(response);
-    Logger.log(response.length);
-    var errorResponse = response.getResponseCode();
-    Logger.log(errorResponse);
-}
+//     var response = UrlFetchApp.fetch(apiUrl, options);
+//     Logger.log(response);
+//     Logger.log(response.length);
+
+//     if (response.getResponseCode() === 200) {
+//         var responseData = response.getContentText();
+//         var jsonData = JSON.parse(responseData);
+//         var content = jsonData.data.content;
+//         Logger.log(content.length);
+//         var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+//         var celdaActiva = hojaActiva.getActiveCell();
+        
+//         var keys = {
+//             "id": "Id",
+//             "fecha": "Fecha",
+//             "prefijo": "Prefijo",
+//             "numero": "Número",
+//             "empresa": "Empresa",
+//             "terceroExterno": "Proveedor",
+//             "terceroInterno": "Comprador",
+//             "formaPago": "Forma de Pago",
+//             "concepto": "Concepto",
+//         };
+
+//         var j = 0;
+//         for (var key in keys) {
+//             var headerCell = celdaActiva.offset(0, j);
+//             headerCell.setValue(keys[key]);
+//             j++;
+//         }
+
+//         for (var i = 0; i < content.length; i++) {
+//             j = 0;
+//             for (var key in keys) {
+//                 var cell = celdaActiva.offset(i + 1, j);  
+//                 if(key == 'id'){
+//                     cell.setValue(String(content[i][key]));
+//                 }else{
+//                     cell.setValue(content[i][key]); 
+//                 }
+//                 j++;
+//             }
+//         }
+//         PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentos', '');
+//     } else {
+//         PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentos', '');
+//         var errorResponse = response.getResponseCode();
+//         Logger.log("Error response: " + errorResponse);
+//         mapeoErroresDocumentoCompra(errorResponse);
+//     }
+
+
+// }
+
+
 
 
 ////////////////////// Llamado de vistas general //////////////////////
