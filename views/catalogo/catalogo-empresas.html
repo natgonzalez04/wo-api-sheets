@@ -72,7 +72,6 @@
 
                     google.script.run.withSuccessHandler(function(result) {
                             
-                        console.log(result,'result');
                         resulAll = result;
                         result.forEach(function(elemento) {
                         var fila = document.createElement('tr');
@@ -121,7 +120,6 @@
 
                     for(var i = 0; i < optionsExit.length; i++) {
                         optionsExit[i].addEventListener('change', function() {
-                            console.log(this.value,'this.valueCheck');
                             selectOptionSend = this.value;
                             google.script.run.guardarSeleccionOpcionEmpresa(selectOptionSend);
                         });
@@ -149,7 +147,6 @@
                     }
 
                     function sendDataSelected() {
-                        console.log(selecciones,'selecciones');
                         google.script.run.mostrarDatosCeldaEmpresa();
                         google.script.host.close();
                     }

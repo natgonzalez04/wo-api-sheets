@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <base target="_top">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    </head>
+    <body>
+
+            <section class="containerCatalogoBase">
+
+                <section class="titleCatalogo">
+                    <span>Diligencia los campos requeridos para realizar el envio de tu documento</span>
+                </section>
+
+                <section class="observacionesInfo">
+                    <h4>Para tener en cuenta</h4>
+                    <ul>
+                        <li>
+                            Podras enviar por email los siguientes documentos de venta factura de venta, nota credito venta, nota debito venta, remision de ventas, cotización y pedido.
+                        </li>
+                        <li>
+                            Podras enviar por email los siguientes documentos de compra factura de compra, nota credito compra, nota debito compra, remision de compra, orden Compra y devoluciones de remisiones de Compra.
+                        </li>
+                    </ul>
+                </section>
+
+                <div class="containerAllInformacion">
+                    <button type="button" onclick="mostrarOpcionesConsulta()" style="margin: 0 5px 10px 0;">Ver Informacion de consulta 
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#5a5a5a" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <section class="containerConsultaDocumento">
+                    
+                    <div class="containerDocumento" style="display: flex!important; flex-direction: column; margin-bottom: 15px;">
+                        <label style="font-weight: 600; color: #5a5a5a; margin-right: 15px;" for="tipoDocumento">Categoria de documento*: </label>
+                        <select name="grupoDocumento" id="grupoDocumento" class="opcionDocumento">
+                            <option value="" disabled selected>Selecciona</option>
+                            <option value="VENTAS">Documentos de venta</option>
+                            <option value="COMPRAS">Documentos de compras</option>
+                            <option value="CONTABLES">Documentos contables</option>
+                        </select>
+
+                    </div>
+
+                    <div class="titleInfo" style="font-weight: 600; margin: 10px 0 10px 0;">
+                        <span>Selecciona el tipo de documento e ingresa el numero</span>
+                    </div>
+
+                    <div style="display: inline-flex" class="containerDocData">
+
+                        <div class="containerDocumento" style="display: none; flex-direction: column;" id="containerCompras">
+                            <label style="font-weight: 600; color: #5a5a5a; margin-right: 15px;" for="tipoDocumentoCompras">Tipo de documento*: </label>
+                            <select name="tipoDocumentoCompras" id="tipoDocumentoCompras" class="opcionDocumento">
+                                <option value="" disabled selected>Selecciona</option>
+                                <option value="FC">Factura de compra</option>
+                                <option value="NCC">Nota credito compra</option>
+                                <option value="NDC">Nota debito compra</option>
+                                <option value="REMC">Remision de compra</option>
+                                <option value="OC">Orden Compra</option>
+                                <option value="DREMC">Devoluciones de Remisiones de Compra</option>
+                            </select>
+
+                        </div>
+
+                        <div class="containerDocumento" style="display: none; flex-direction: column;" id="containerVentas">
+                            <label style="font-weight: 600; color: #5a5a5a; margin-right: 15px;" for="tipoDocumentoVentas">Tipo de documento*: </label>
+                            <select name="tipoDocumentoVentas" id="tipoDocumentoVentas" class="opcionDocumento">
+                                <option value="" disabled selected>Selecciona</option>
+                                <option value="FV">Factura de venta</option>
+                                <option value="NCV">Nota credito venta</option>
+                                <option value="NDV">Nota debito venta</option>
+                                <option value="REM">Remision de ventas</option>
+                                <option value="CZ">Cotización</option>
+                                <option value="PD">Pedido</option>
+                            </select>
+
+                        </div>
+
+                        <div class="containerDocumento" style="display: none; flex-direction: column;" id="containerContables">
+                            <label style="font-weight: 600; color: #5a5a5a; margin-right: 15px;" for="tipoDocumentoContables">Tipo de documento*: </label>
+                            <select name="tipoDocumentoContables" id="tipoDocumentoContables" class="opcionDocumento">
+                                <option value="" disabled selected>Selecciona</option>
+                                <option value="CE">Comprobante de Egreso</option>
+                                <option value="RC">Recibo de Caja</option>
+                                <option value="NC">Nota de Contabilidad</option>
+                            </select>
+
+                        </div>
+                        
+                        <div style="display: inline-flex; margin-left: 40px;">
+                            <label for="numeroDocumento">Numero:
+                            <input type="number" name="numeroDocumento" id="numeroDocumento" min="0" placeholder="Numero">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="display: inline-flex" class="containerDocVenta">
+
+                    </div>
+
+                    <div class="mensajeErrorConsulta">
+                        <span>Por favor, completa el campo para continuar</span>
+                    </div>
+                </section>
+
+                <div style="width: 100%; padding-left: 7.5vw; margin-top: 2vh;" id="contenedorButtonConsulta">
+                    <button type="button" class="btnConsultaInicial" id="buttonConsulta" onclick="consultaDataSelected()">Consultar Documento</button>
+                </div>
+
+                <div class="mensajeErrorInicial">
+                    <span style="padding-left: 10%;">Por favor, espera estamos validando la cantidad de documentos disponibles para envio</span>
+                </div>
+
+                <div style="font-weight: 600; margin: 10px 0 10px 0;" class="containerApoyoRegistros">
+                    <span style="font-weight: 600; font-size: 14px;" id="titleAllDocs">Selecciona un solo documento para envio</span>
+                    <span style="font-weight: 600; font-size: 14px;" id="titleOneDoc">Datos Documento</span>
+                </div>
+
+                <section class="containerCatalogo">
+                    <table id="miTabla" class="tablaData">
+                    </table>
+                    
+                </section>
+
+                <div class="subTitleInfo" style="font-weight: 600; margin:0; font-size: 14px;">
+                    <span>Ingresa los datos del destinatario</span>
+                </div>
+
+                <section class="containerInfoEmail">
+
+                        <label for="email">Correo electrónico*:</label>
+                        <input type="email" name="email" id="email" min="0" placeholder="" >
+                        <br>
+            
+                        <label for="nombreDestinatario">Nombre del destinatario*:</label>
+                        <input type="text" name="nombreDestinatario" id="nombreDestinatario" min="0" placeholder="" >
+                        <br>
+
+                </section>
+
+                <section>
+                    <div class="mensajeErrorDocumento" style="width: 80%;">
+                        <span>Por favor, completa los campos requeridos para continuar</span>
+                    </div>
+                </section>
+
+                <button type="button" class="buttonImport" id="buttonImport" onclick="sendDataSelected()">Enviar</button>
+
+            </section>  
+            <div id="loading" class="loading" style="display:none;">
+                <div class="d-flex justify-content-center align-items-end">
+                        <div class="spinner-grow" style="width: 1rem; height: 1rem" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                        <div class="spinner-grow " style="width: 2rem; height: 2em" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                        <div class="spinner-grow" style="width: 3rem; height: 3rem" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>   
+                </div>
+                <p style=" margin-top: 3vh; font-weight: 600; color: #0d95f0;">Enviando datos</p>
+            </div>
+
+            <div id="mensajeCorreoExitoso" class="mensajeCorreoExitoso" style="display:none;">
+                <h4>Tu documento ha sido enviado con exito !!!</h4>
+            </div>
+            
+            <script>
+                var contenedorGlobal = document.querySelector('.containerCatalogoBase');
+                var contenedorData = document.querySelector('.containerDocData'); 
+                var contenedorInfoEmail = document.querySelector('.containerInfoEmail');
+                var contenedorLoading = document.querySelector('.loading');
+                var idDocumento = document.getElementById('idDocumento');
+                var email = document.getElementById('email');
+                var nombreDestinatario = document.getElementById('nombreDestinatario');
+                var mensajeError = document.querySelector('.mensajeErrorDocumento');
+                var mensajeCorreoExitoso = document.getElementById('mensajeCorreoExitoso');
+                var selectCategory = document.getElementById('grupoDocumento');
+                var containerCompras = document.getElementById('containerCompras');
+                var containerVentas = document.getElementById('containerVentas');
+                var containerContables = document.getElementById('containerContables');
+                var infotitle = document.querySelector('.titleInfo');
+                var infoSubtitle = document.querySelector('.subTitleInfo');
+                var selectDocumentVentas = document.getElementById("tipoDocumentoVentas");
+                var selectDocumentCompras = document.getElementById("tipoDocumentoCompras");
+                var selectDocumentContables = document.getElementById("tipoDocumentoContables");
+                var numeroDocumento = document.getElementById('numeroDocumento');
+                var btnEnvioGeneral = document.getElementById('buttonImport');
+                var contenedorButtonConsulta = document.getElementById('contenedorButtonConsulta');
+                var tabla = document.getElementById('miTabla');
+                var optionsExit = document.getElementsByName('option');
+                var optionChecked = document.querySelector('input[name="option"]:checked');
+                var containerCatalogo = document.querySelector('.containerCatalogo');
+                var mensajeErrorInicial = document.querySelector('.mensajeErrorInicial');
+                var titleAllDocs = document.getElementById('titleAllDocs');
+                var titleOneDoc = document.getElementById('titleOneDoc');
+                var containerApoyoRegistros = document.querySelector('.containerApoyoRegistros');
+                var containerAllInformacion = document.querySelector('.containerAllInformacion');
+                var containerConsultaDocumento = document.querySelector('.containerConsultaDocumento');
+
+                var resulAll = [];
+                var selecciones = [];
+                var idDocumentoValidado = '';
+                var validacionCategoriaDocumento = '';
+                var finalCategoriaSeleccion = '';
+
+                contenedorGlobal.style.display = 'flex';
+                contenedorData.style.display = 'none';
+                contenedorInfoEmail.style.display = 'none';
+                btnEnvioGeneral.style.display = 'none';
+                infotitle.style.display = 'none';
+                infoSubtitle.style.display = 'none';
+                contenedorButtonConsulta.style.display = 'none';
+                containerCatalogo.style.display = 'none';
+                mensajeErrorInicial.style.display = 'none';
+                containerApoyoRegistros.style.display = 'none';
+                titleOneDoc.style.display = 'none';
+                titleAllDocs.style.display = 'none';
+                containerAllInformacion.style.display = 'none';
+
+
+                selectCategory.addEventListener('change', function() {
+
+                    if (!selectCategory.value || selectCategory.value == null) {
+                        mensajeError.style.display = 'block';
+                    }else{
+                        infotitle.style.display = 'block';
+                        contenedorButtonConsulta.style.display = 'flex';
+                        numeroDocumento.value = null;
+                        selectDocumentVentas.value = null;
+                        selectDocumentCompras.value = null;
+                        selectDocumentContables.value = null;
+                        
+                        if(selectCategory.value == 'VENTAS'){
+                            contenedorData.style.display = 'flex';
+                            containerCompras.style.display = 'none';
+                            containerContables.style.display = 'none';
+                            containerVentas.style.display = 'flex';
+                        }else if(selectCategory.value == 'COMPRAS'){
+                            contenedorData.style.display = 'flex';
+                            containerVentas.style.display = 'none';
+                            containerContables.style.display = 'none';
+                            containerCompras.style.display = 'flex';
+                        }else if(selectCategory.value == 'CONTABLES'){
+                            contenedorData.style.display = 'flex';
+                            containerVentas.style.display = 'none';
+                            containerCompras.style.display = 'none';
+                            containerContables.style.display = 'flex';
+                        }
+                    }
+                });
+
+                function guardarValidacionInicial(){
+
+                    if((numeroDocumento.value && selectDocumentVentas.value && selectCategory.value) || (numeroDocumento.value && selectDocumentCompras.value && selectCategory.value)|| (numeroDocumento.value && selectDocumentContables.value && selectCategory.value)){
+                        
+                        mensajeError.style.display = 'none';
+                        var seleccionDocSelect = {
+                            categoriaDocumento: selectCategory.value,
+                            numeroDocumento: numeroDocumento.value,
+                            tipoDocumento: selectDocumentVentas.value ? selectDocumentVentas.value : selectDocumentCompras.value ? selectDocumentCompras.value : selectDocumentContables.value ? selectDocumentContables.value : null
+                        };
+
+                    google.script.run.guardarSeleccionDocumentoGeneral(seleccionDocSelect);
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }
+
+                numeroDocumento.onchange = guardarValidacionInicial;
+                selectDocumentVentas.onchange = guardarValidacionInicial;
+                selectDocumentCompras.onchange = guardarValidacionInicial;
+                selectDocumentContables.onchange = guardarValidacionInicial;
+
+                function consultaDataSelected() {
+                        var validacionCamposIniciales = guardarValidacionInicial();
+
+                        if (validacionCamposIniciales) {
+                            mensajeErrorInicial.style.display = 'flex';
+                            google.script.run.withSuccessHandler(function(result) {
+                                mensajeErrorInicial.style.display = 'none';
+                                containerApoyoRegistros.style.display = 'flex';
+                                containerCatalogo.style.display = 'flex';
+
+
+                                    google.script.run.withSuccessHandler(function(result) {
+
+                                        resulAll = result;
+                                            if(result.length == 1){
+                                                titleOneDoc.style.display = 'block';
+                                                titleAllDocs.style.display = 'none';
+                                            }else if(result.length > 1){
+                                                titleOneDoc.style.display = 'none';
+                                                titleAllDocs.style.display = 'block';
+                                            }
+
+                                            resulAll.forEach(function(elemento) {
+                                                var fila = document.createElement('tr');
+                                                var celda = document.createElement('td');
+                                                celda.textContent = elemento.id + ' | ' + elemento.fecha + ' | ' +  elemento.numero + ' | ' + elemento.empresa + ' | ' + elemento.terceroExterno + ' | ' + elemento.terceroInterno + ' | ' + elemento.formaPago + ' | ' + elemento.concepto;
+                                                celda.classList.add('celdaTabla');
+                                                fila.appendChild(celda);
+                                                fila.classList.add('filaTabla');
+                                                fila.addEventListener('click', clickCell);
+                                                tabla.appendChild(fila);
+                                            });
+                                    
+                                    }).getDataRetornoDocumentos();
+
+
+                            }).withFailureHandler(function(error) {
+                                // google.script.host.close();
+                            }).consultarDocumentoGeneralSelect();
+                        }
+                }
+
+                function clickCell(evento) {
+                        var seleccion = evento.target.textContent;
+                        if (selecciones.includes(seleccion)) {
+                            selecciones = selecciones.filter(function(elemento) {
+                                return elemento !== seleccion;
+                            });
+                            evento.target.classList.remove('selectedCelda');
+                        } else {
+                            if (selecciones.length == 1) {
+                                selecciones = [];
+                                var cells = document.querySelectorAll('td');
+                                for (var i = 0; i < cells.length; i++) {
+                                    cells[i].classList.remove('selectedCelda');
+                                }
+                            }else if(selecciones.length == 0){
+                                containerAllInformacion.style.display = 'none';
+                            }
+                            containerAllInformacion.style.display = 'flex';
+                            containerConsultaDocumento.style.display = 'none';
+                            contenedorButtonConsulta.style.display = 'none';
+                            contenedorInfoEmail.style.display = 'flex';
+                            infoSubtitle.style.display = 'block';
+                            btnEnvioGeneral.style.display = 'block';
+                            selecciones.push(seleccion);
+                            evento.target.classList.add('selectedCelda');
+
+                        }
+
+                        var elementos = selecciones[0].split(' | ');
+                        idDocumentoValidado = elementos[0];
+                        validacionCategoriaDocumento = elementos[elementos.length - 1];
+
+                }
+
+
+                function mostrarOpcionesConsulta(){
+                    containerConsultaDocumento.style.display = 'flex';
+                    contenedorButtonConsulta.style.display = 'flex';
+                    contenedorInfoEmail.style.display = 'none';
+                    infoSubtitle.style.display = 'none';
+                    btnEnvioGeneral.style.display = 'none';
+                }
+
+
+                var docVentas = ['FACTURA DE VENTA', 'NOTA CREDITO VENTA', 'NOTA DEBITO VENTA', 'REMISION DE VENTAS', 'COTIZACION', 'PEDIDO'];
+                var docCompras = [ 'FACTURA DE COMPRA', 'NOTA CREDITO COMPRA', 'NOTA DEBITO COMPRA', 'REMISION DE COMPRA', 'ORDEN COMPRA', 'DEVOLUCIONES DE REMISIONES DE COMPRA'];
+                var docContables = ['COMPROBANTE DE EGRESO', 'RECIBO DE CAJA', 'NOTA DE CONTABILIDAD'];
+
+                function guardarSeleccionFinal() {
+
+                    finalCategoriaSeleccion = docVentas.includes(validacionCategoriaDocumento) ? 'VENTAS' : docCompras.includes(validacionCategoriaDocumento) ? 'COMPRAS' : docContables.includes(validacionCategoriaDocumento) ? 'CONTABLES' : null
+
+                    if(email.value && nombreDestinatario.value && idDocumentoValidado){
+                        mensajeError.style.display = 'none';
+                        var dataInfoEmail = {
+                            idDocumento: idDocumentoValidado,
+                            email: email.value,
+                            nombreDestinatario: nombreDestinatario.value,
+                        };
+                        google.script.run.guardarDocumentoEmailFinal(dataInfoEmail);
+                        return true;
+                    }else{
+                        return false;
+                    }
+
+                }
+
+
+                idDocumentoValidado.onchange = guardarSeleccionFinal;
+                email.onchange = guardarSeleccionFinal;
+                nombreDestinatario.onchange = guardarSeleccionFinal;
+
+                function sendDataSelected() {
+                        var validacionCamposFinales = guardarSeleccionFinal();
+
+                        if(validacionCamposFinales && finalCategoriaSeleccion == 'VENTAS'){
+                                contenedorGlobal.style.display = 'none';
+                                contenedorLoading.style.display = 'flex';
+                                google.script.run.withSuccessHandler(function(result) {
+                                    contenedorLoading.style.display = 'none';
+                                    mensajeCorreoExitoso.style.display = 'block';
+                                    setTimeout(function(){
+                                        google.script.host.close();
+                                    }, 3000);
+                                }).withFailureHandler(function(error) {
+                                    google.script.host.close();
+                                }).enviarDocumentoEmailVenta();
+                        }else if(validacionCamposFinales && finalCategoriaSeleccion == 'COMPRAS'){
+                                contenedorGlobal.style.display = 'none';
+                                contenedorLoading.style.display = 'flex';
+                                google.script.run.withSuccessHandler(function(result) {
+                                    contenedorLoading.style.display = 'none';
+                                    mensajeCorreoExitoso.style.display = 'block';
+                                    setTimeout(function(){
+                                        google.script.host.close();
+                                    }, 3000);
+                                }).withFailureHandler(function(error) {
+                                    google.script.host.close();
+                                }).enviarDocumentoEmailCompra();
+                        }else if(validacionCamposFinales && finalCategoriaSeleccion == 'CONTABLES'){
+                                contenedorGlobal.style.display = 'none';
+                                contenedorLoading.style.display = 'flex';
+                                google.script.run.withSuccessHandler(function(result) {
+                                    contenedorLoading.style.display = 'none';
+                                    mensajeCorreoExitoso.style.display = 'block';
+                                    setTimeout(function(){
+                                        google.script.host.close();
+                                    }, 3000);
+                                }).withFailureHandler(function(error) {
+                                    google.script.host.close();
+                                }).enviarDocumentoEmailContable();
+                        }else{
+                            mensajeError.style.display = 'block';
+                        }
+
+                    }
+
+            </script>
+    </body>
+</html>

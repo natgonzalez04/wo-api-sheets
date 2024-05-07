@@ -220,7 +220,7 @@
                     containerInfoFiltroAdicional.style.display = 'none';
 
                     var encabezados = ['Id', 'Fecha', 'Prefijo', 'Número', 'Empresa', 'Proveedor', 'Comprador', 'Forma de Pago', 'Concepto'];
-                    var datos = ['1', '2024-01-12', 'DVVP','42158', 'Compañia Electrodomesticos SAS', 'Company LTDA', 'William Diaz', 'Crédito', 'Factura de venta'];
+                    var datos = ['1', '2024-01-12', 'DVVP','42158', 'Compañia Electrodomesticos SAS', 'Company LTDA', 'William Diaz', 'Crédito', 'Factura de compra'];
 
                 
                     var tabla = document.createElement('table');
@@ -269,7 +269,7 @@
                                 terceroTipo: selectTipoTercero.value ? selectTipoTercero.value : null,
                                 tercero: terceroSelect.value ? terceroSelect.value : null,
                             };
-                            console.log(seleccionPaginado);
+
                             google.script.run.guardarSeleccionPaginadoDocumentosCompra(seleccionPaginado);
                             return true;
                         }else{
@@ -280,7 +280,6 @@
 
                     selectDocument.addEventListener('change', function() {
     
-                        console.log(this.value,'this.value');
                         if (!selectDocument.value || selectDocument.value == null) {
                             mensajeError.style.display = 'block';
                         }else{
@@ -293,18 +292,11 @@
                             prefijoSelect.value = null;
                             terceroSelect.value = null;
                             selectTipoTercero.value = null;
-                            // mensajeValidacionRegistros.style.display = 'block';
+                    
                             google.script.run.withSuccessHandler(function() {
-                            // google.script.run.withSuccessHandler(function() {
-                            //     google.script.run.withSuccessHandler(function(result) {
-                            //         console.log(result,'result');
-                            //         mensajeValidacionRegistros.style.display = 'none';
-                            //         registrosDocumento.textContent = result;
-                            //         totalImportacion.style.display = 'inline-flex';
+
                                     contenedorOpciones.style.display = 'flex';
-                            //         estadoRegistros = true;
-                            //     }).getDataTotalRegistros();
-                            //     }).validacionInicial();
+
                             }).guardarSeleccionPaginadoDocumentosCompra(seleccionPaginado);
                         }
                     });
@@ -415,7 +407,7 @@
                     }
 
                     selectAll.addEventListener('change', function(e) {
-                        console.log(e.target.checked,'e.target.checked');
+
                         mensajeError.style.display = 'none';
                         if (e.target.checked) {
                             mensajeValidacionRegistros.style.display = 'block';
@@ -430,7 +422,7 @@
                             allRegistros = true;
                             google.script.run.withSuccessHandler(function() {
                                 google.script.run.withSuccessHandler(function(result) {
-                                    console.log(result,'result');
+                            
                                     mensajeValidacionRegistros.style.display = 'none';
                                     registrosDocumento.textContent = result;
                                     totalImportacion.style.display = 'flex';

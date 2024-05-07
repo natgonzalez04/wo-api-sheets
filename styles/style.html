@@ -72,6 +72,7 @@
             justify-content: flex-start;
             flex-direction: column;
             height: 100vh;
+            min-height: 50px;
             overflow-y: auto;
             overflow-x: hidden;
             /* background-color: tomato; */
@@ -369,7 +370,7 @@
             flex-direction: column;
             justify-content: flex-start;
             align-items: space-evenly;
-            margin-top: 4vh;
+            margin-top: 2vh;
             padding: 0 8vw 0 8vw;
         }
 
@@ -383,6 +384,40 @@
         .containerConsultaDocumento label{
             font-weight: 600;
             color: #5a5a5a;
+        }
+
+        .containerInfoEmail{
+            display: flex;
+            width: 80%;
+            flex-direction: column;
+            margin-top: 20px;
+            font-size: 14px;
+            margin: 3% 0 0 15%;
+            justify-content: space-around;
+        }
+
+        .containerInfoEmail input{
+            border: none;
+            border-bottom: #646464 1px solid;
+            outline: none;
+            width: 180px;
+            text-align: center;
+            width: 80%;
+        }
+
+        .containerInfoEmail label{
+            font-weight: 600;
+            color: #5a5a5a;
+        }
+
+        .mensajeCorreoExitoso{
+            color: #0d95f0;
+            width: 100%;
+            padding-top: 30%;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .containerEjemplo{
@@ -641,6 +676,26 @@
         .btnFiltroActive{
             background-color: #1e458d;
             color: white;
+        }
+
+        .btnConsultaInicial{
+            border: none;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            font-size: 12px;
+            width: 20vw;
+            float: left;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-radius:8px;
+            background-color: #f3f3f3;
+        }
+
+        .containerAllInformacion button{
+            border: none;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            font-size: 14px;
+            width: 35vw;
+            border-bottom: 1px solid #676767;
         }
         
         </style>

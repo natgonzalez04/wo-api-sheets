@@ -134,13 +134,13 @@
                         
                         if(idDocumento.value && selectDocument.value) {
                             mensajeError.style.display = 'none';
-                            var seleccionTercero = {
+                            var seleccionDocVenta = {
                                 idDocumento: idDocumento.value,
                                 importarEncabezados: checkboxEncabezados,
                                 tipoDocumento: selectDocument.value
                             };
-                            console.log(seleccionTercero.importarEncabezados,'seleccionTercero');
-                            google.script.run.guardarSeleccionDocumentoVenta(seleccionTercero);
+
+                            google.script.run.guardarSeleccionDocumentoVenta(seleccionDocVenta);
                             return true;
                         }else{
                             mensajeError.style.display = 'block';

@@ -980,8 +980,8 @@ function listarRegistroTerceroVendedor(documento, vendedor){
 ////////////////////// Consultar documento venta por identificacion //////////////////////
 
 function consultarDocumentoVenta(){
-    var selectConsultarTerceros = 'consultarDocumentoVenta';
-    viewGeneralDocumentos(selectConsultarTerceros);
+    var selectConsultarDocVenta = 'consultarDocumentoVenta';
+    viewGeneralDocumentos(selectConsultarDocVenta);
 }
 
 function guardarSeleccionDocumentoVenta(seleccion) {
@@ -1108,7 +1108,7 @@ function mostrarDatosConsultaDocumentoVenta() {
             var errorResponse = response.getResponseCode();
             Logger.log("Error response: " + errorResponse);
             Logger.log(errorResponse.errorCode,'asdasdasdasdsad');
-            mapeoErrores(errorResponse);
+            mapeoErroresDocumento(errorResponse);
         }
 
     }
@@ -1117,6 +1117,12 @@ function mostrarDatosConsultaDocumentoVenta() {
 
 }
 
+////////////////////// Enviar documento compra por Email //////////////////////
+
+function consultarEnvioEmailDocumento(){
+    var enviarEmailDocumento = 'enviarEmailDocumento';
+    viewGeneralDocumentos(enviarEmailDocumento);
+}
 
 ////////////////////// Llamado de vistas general //////////////////////
 
@@ -1135,6 +1141,13 @@ function viewGeneralDocumentos(select){
         .setWidth(720)
         .setHeight(490);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Consultar Documentos de Venta');
+    }else if(select == 'enviarEmailDocumento'){
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/documentos/documento-enviar-email.html').getContent();
+        var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
+        var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
+        .setWidth(720)
+        .setHeight(600);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Enviar documento por email');
     }
 
 

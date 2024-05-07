@@ -88,7 +88,6 @@
 
                     google.script.run.withSuccessHandler(function(result) {
                             
-                        console.log(result,'result');
                         resulAll = result;
                         result.forEach(function(elemento) {
                         var fila = document.createElement('tr');
@@ -133,14 +132,12 @@
                     
                     selectNaturalezaCuenta.addEventListener('change', function() {
                         var selectedOptionText = this.options[this.selectedIndex].text;
-                        console.log('El texto de la opción seleccionada es: ' + selectedOptionText);
 
 
                         resulAll = resulAll.filter(function(elemento) {
                             return elemento.cuentaContableTipo.cuentaContableNaturaleza == selectedOptionText;
                         });
 
-                        console.log(resulAll);
                     });
 
                     document.getElementById('addAllCheckbox').addEventListener('change', function(e) {
@@ -176,7 +173,6 @@
 
                     for(var i = 0; i < optionsExit.length; i++) {
                         optionsExit[i].addEventListener('change', function() {
-                            console.log(this.value,'this.valueCheck');
                             selectOptionSend = this.value;
                             google.script.run.guardarSeleccionOpcionCuentaContable(selectOptionSend);
                         });
@@ -204,7 +200,6 @@
                     }
 
                     function sendDataSelected() {
-                        console.log(selecciones,'selecciones');
                         google.script.run.mostrarDatosCeldaCuentaContable();
                         google.script.host.close();
                     }

@@ -10,7 +10,7 @@
 
             <section class="containerCatalogoBase">
                 <section class="titleCatalogo">
-                    <span>Ingresa el numero de id del tercero que quieres consultar su dirección</span>
+                    <span>Selecciona el tipo de documento e ingresa el numero del documento de compra que quieres consultar</span>
                 </section>
                 <section class="observacionesInfo">
                     <h4>Para tener en cuenta</h4>
@@ -32,11 +32,24 @@
                     </label>
                 </section>
 
-                <section class="containerConsultaTercero">
-                    <div style="display: inline-flex; margin-left: -3vw;">
+                <section class="containerConsultaDocumento">
+                    <div style="display: inline-flex">
+                        <div class="containerDocumento" style="display: flex!important; flex-direction: column;">
+                            <label style="font-weight: 600; color: #5a5a5a; margin-right: 15px;" for="tipoDocumento">Tipo de documento*: </label>
+                            <select name="tipoDocumento" id="tipoDocumento" class="opcionDocumento">
+                                <option value="" disabled selected>Selecciona</option>
+                                <option value="FC">Factura de compra</option>
+                                <option value="NCC">Nota credito compra</option>
+                                <option value="NDC">Nota debito compra</option>
+                                <option value="REMC">Remision de compra</option>
+                                <option value="OC">Orden Compra</option>
+                                <option value="DREMC">Devoluciones de Remisiones de Compra</option>
+                            </select>
+
+                        </div>
                         <div style="display: inline-flex; margin-left: 40px;">
-                            <label for="idTercero">Id:
-                            <input type="number" name="idTercero" id="idTercero" min="0" placeholder="# id">
+                            <label for="idDocumento">Numero:
+                            <input type="number" name="idDocumento" id="idDocumento" min="0" placeholder="Numero">
                             </label>
                         </div>
                     </div>
@@ -77,8 +90,8 @@
                     var statusCheck;
                     contenedorGlobal.style.display = 'flex';
 
-                    var encabezados = [ 'Dirección', 'Ciudad', 'Telefono principal', 'Email principal', 'Nombre de dirección o sucursal', 'Principal'];
-                    var datos = ['Cl 12 21 85', 'Bogota DC', '3021458796', 'admon@miempresa.com', 'Principal','Si'];
+                    var encabezados = ['Id', 'Fecha', 'Prefijo', 'Número', 'Empresa', 'Cliente', 'Vendedor', 'Forma de Pago', 'Concepto'];
+                    var datos = ['1', '2024-01-12', 'DVVP','42158', 'Compañia Electrodomesticos SAS', 'Company LTDA', 'William Diaz', 'Crédito', 'Factura de compra'];
 
                 
                     var tabla = document.createElement('table');
@@ -112,21 +125,22 @@
                     seccion.appendChild(tabla);
 
                     function guardarSeleccion() {
-                        var identificacion = document.getElementById('identificacion');
-                        var idTercero = document.getElementById('idTercero');
+                        var selectDocument = document.getElementById("tipoDocumento");
+                        var idDocumento = document.getElementById('idDocumento');
                         var mensajeError = document.querySelector('.mensajeErrorConsulta');
                         var checkboxEncabezados = document.getElementById('addEncabezado').checked;
 
                         checkboxEncabezados.onchange = guardarSeleccion;
                         
-                        if(idTercero.value) {
+                        if(idDocumento.value && selectDocument.value) {
                             mensajeError.style.display = 'none';
-                            var seleccionTercero = {
-                                idTercero: idTercero.value,
-                                importarEncabezados: checkboxEncabezados
+                            var seleccionDocCompra = {
+                                idDocumento: idDocumento.value,
+                                importarEncabezados: checkboxEncabezados,
+                                tipoDocumento: selectDocument.value
                             };
 
-                            google.script.run.guardarSeleccionTerceroDireccion(seleccionTercero);
+                            google.script.run.guardarSeleccionDocumentoCompra(seleccionDocCompra);
                             return true;
                         }else{
                             mensajeError.style.display = 'block';
@@ -137,8 +151,7 @@
                     }
                     
                     
-                    identificacion.onchange = guardarSeleccion;
-                    idTercero.onchange = guardarSeleccion;
+                    idDocumento.onchange = guardarSeleccion;
                     
 
                     function sendDataSelected() {
@@ -150,7 +163,7 @@
                                 google.script.host.close();
                             }).withFailureHandler(function(error) {
                                 google.script.host.close();
-                            }).mostrarDatosConsultaTerceroDireccion();
+                            }).mostrarDatosConsultaDocumentoCompra();
                         }
                     
                     }

@@ -72,7 +72,6 @@
 
                     google.script.run.withSuccessHandler(function(result) {
                             
-                        console.log(result,'result');
                         resulAll = result;
                         result.forEach(function(elemento) {
                         var fila = document.createElement('tr');
@@ -101,7 +100,6 @@
                                 cells[i].classList.add('selectedCelda');
                             }
 
-                            console.log(selecciones,'seleccionesV2');
                         } else {
 
                             selecciones = [];
@@ -137,12 +135,12 @@
                             selecciones.push(seleccion);
                             evento.target.classList.add('selectedCelda');
                         }
-                        console.log(selecciones);
+
                         google.script.run.guardarSeleccionTipoContribuyente(selecciones);
                     }
 
                     function sendDataSelected() {
-                        console.log(selecciones,'selecciones');
+
                         google.script.run.mostrarDatosCeldaTipoContribuyente();
                         google.script.host.close();
                     }

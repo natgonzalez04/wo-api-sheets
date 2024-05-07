@@ -82,7 +82,9 @@ function activarOpciones(){
     var Documentos = ui.createMenu('Documentos')
     .addItem('Listar documentos de ventas', 'listarDocumentosVenta')
     .addItem('Consultar documentos de ventas', 'consultarDocumentoVenta')
-    .addItem('Listar documentos de compra', 'listarDocumentosCompra');
+    .addItem('Listar documentos de compra', 'listarDocumentosCompra')
+    .addItem('Consultar documento de compra', 'consultarDocumentoCompra')
+    .addItem('Enviar documentos por Email', 'consultarEnvioEmailDocumento');
 
     var Inventarios = ui.createMenu('Inventarios')
     .addItem('Consultar todos los inventarios', 'inventariosListar')
@@ -92,7 +94,7 @@ function activarOpciones(){
     .addItem('Listar cuentas contables', 'listarCuentasContables');
 
     var Contabilidad = ui.createMenu('Contabilidad')
-    .addItem('Consultar documentos contables', 'documentosVenta');
+    .addItem('Consultar documentos contabilidad', 'consultarDocumentoContabilidad');
 
     var menu = ui.createMenu('World Office');
     menu.addItem('Ver Token', 'mostrarClaveAPI')
@@ -114,15 +116,6 @@ function mostrarClaveAPI(){
 }
 
 ////////////////////// funciones de documentos //////////////////////
-
-
-function listardocumentosCompra(){
-
-}
-
-function functiondireccionesListar(){
-
-}
 
 function inventariosListar(){
 
