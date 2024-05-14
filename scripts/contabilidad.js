@@ -151,16 +151,146 @@ function mostrarDatosConsultaDocumentoContabilidad() {
 
 }
 
+////////////////////// Listar formas de Pago //////////////////////
+
+function listarFormasPagoContabilidad(){
+    var selectFormaPago = 'formaPagoContabilidad';
+
+    var claveAPI = almacenamientoClave();
+
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/contabilidad/listarFormasPagoContable';
+    
+    var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': claveAPI,
+    };
+
+    var options = {
+        'method': 'post',
+        'headers': headers,
+        'payload': JSON.stringify(payload),
+        'muteHttpExceptions': true
+    };
+    
+    var response = UrlFetchApp.fetch(apiUrl, options);
+
+    if (response.getResponseCode() === 202) {
+        var responseData = response.getContentText();
+        var jsonData = JSON.parse(responseData);
+        var content = jsonData.data.content;
+        Logger.log(content);
+        viewGeneralDocumentosContabilidad(selectFormaPago);
+        var scriptPropertiesFormaPago = PropertiesService.getScriptProperties();
+        scriptPropertiesFormaPago.setProperty('contentFormaPagoContabilidad', JSON.stringify(content));
+    } 
+    else 
+    {
+        var errorResponse = response.getContentText();
+        Logger.log("Error response: " + errorResponse);
+        mapeoErroresDocumentoContabilidad(errorResponse);
+    }
+}
+
+function guardarSeleccionFormaPagoContabilidad(seleccion) {
+    var seleccionString = JSON.stringify(seleccion);
+    PropertiesService.getDocumentProperties().setProperty('seleccionCeldaFormaPagoContabilidad', seleccionString);
+}
+
+function guardarSeleccionOpcionFormaPagoContabilidad(option) {
+    var seleccionOptionData = JSON.stringify(option);
+    PropertiesService.getDocumentProperties().setProperty('optionDataFormaPagoContabilidad', seleccionOptionData);
+}
+
+function getDataFormaPagoContabilidad() {
+    var scriptProperties = PropertiesService.getScriptProperties();
+    var contentDataformaPago = scriptProperties.getProperty('contentFormaPagoContabilidad');
+    return JSON.parse(contentDataformaPago);
+}
+
+function mostrarDatosCeldaFormaPagoContabilidad() {
+    var selectOption = PropertiesService.getDocumentProperties().getProperty('optionDataFormaPagoContabilidad');
+    var option = JSON.parse(selectOption);
+    Logger.log(option);
+    var datosString = PropertiesService.getDocumentProperties().getProperty('seleccionCeldaFormaPagoContabilidad');
+    var datos = JSON.parse(datosString);
+    Logger.log(datos);
+    var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var celdaActiva = hojaActiva.getActiveCell();
+
+    if(option == 'listar'){
+        for (var i = 0; i < datos.length; i++) {
+            var celda = celdaActiva.offset(i,0);
+            celda.setValue(datos[i]);
+        }
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaFormaPagoContabilidad', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataFormaPagoContabilidad', '');
+    }else if(option == 'menu'){
+        var regla = SpreadsheetApp.newDataValidation()
+        .requireValueInList(datos)
+        .build();
+
+        celdaActiva.setDataValidation(regla);
+        PropertiesService.getDocumentProperties().setProperty('seleccionCeldaFormaPagoContabilidad', '');
+        PropertiesService.getDocumentProperties().setProperty('optionDataFormaPagoContabilidad', '');
+    }
+}
+
+////////////////////// Consultar contabilizaciones //////////////////////
+
+function consultarContabilizaciones(){
+    var selectFormaPago = 'consultarContabilizaciones';
+
+    var claveAPI = almacenamientoClave();
+
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/contabilidad/contabilizaciones';
+    
+    var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': claveAPI,
+    };
+
+    var options = {
+        'method': 'post',
+        'headers': headers,
+        'payload': JSON.stringify(payload),
+        'muteHttpExceptions': true
+    };
+    
+    var response = UrlFetchApp.fetch(apiUrl, options);
+
+    if (response.getResponseCode() === 200) {
+        var responseData = response.getContentText();
+        var jsonData = JSON.parse(responseData);
+        var content = jsonData.data.content;
+        Logger.log(content);
+        // viewGeneralDocumentosContabilidad(selectFormaPago);
+        // var scriptPropertiesFormaPago = PropertiesService.getScriptProperties();
+        // scriptPropertiesFormaPago.setProperty('contentFormaPagoContabilidad', JSON.stringify(content));
+    } 
+    else 
+    {
+        var errorResponse = response.getContentText();
+        Logger.log("Error response: " + errorResponse);
+    }
+}
+
 ////////////////////// Llamado de vistas general //////////////////////
 
 function viewGeneralDocumentosContabilidad(select){
     if(select == 'consultarDocumentoContabilidad'){
-        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/contabilidad/documento-consulta-contabilidad.html').getContent();
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/contabilidad/contabilidad-consulta-contabilidad.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
         .setWidth(750)
         .setHeight(490);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Consultar Documentos de Contabilidad');
+    }else if(select == 'formaPagoContabilidad'){
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/contabilidad/contabilidad-forma-pago.html').getContent();
+        var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
+        var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
+        .setWidth(750)
+        .setHeight(490);
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Consultar Forma de Pago Contabilidad');
     }
 }
 

@@ -20,13 +20,21 @@
                             </label>
                         </div>
                         <div class="optFiltro" style="margin-right: -15px">
-                                <label style="font-weight: 600; color: #5a5a5a; margin-right: 15px;" for="naturalezaCuenta">Naturaleza: </label>
+                                <label style="font-weight: 600; color: #5a5a5a; margin-right: 15px;" for="naturalezaCuenta">Tipo: </label>
                                 <select name="naturalezaCuenta" id="naturalezaCuenta" class="opcionDocumento">
-                                    <!-- <option value="" disabled selected>Selecciona</option> -->
+
                                 </select>
                         </div>
                             
                 </section>
+
+                <div style="width: 100%; padding-left: 7.5vw; margin-top: 2vh;" id="contenedorButtonConsulta">
+                    <button type="button" class="btnConsultaInicial" id="buttonConsulta" onclick="consultaDataInicial()">Consultar</button>
+                </div>
+
+                <div class="mensajeErrorInicial">
+                    <span style="padding-left: 10%;">Por favor, espera estamos consultando las cuentas activas disponibles</span>
+                </div>
 
                 <section class="optionAll">
                     <span style="margin-right: 5px;">Seleccionar todos</span>
@@ -81,64 +89,196 @@
                     var optionsExit = document.getElementsByName('option');
                     var optionChecked = document.querySelector('input[name="option"]:checked');
                     var contenedorGlobal = document.querySelector('.containerCatalogoBase');
+                    var containerBase = document.querySelector('.containerCatalogo');
+                    var numeroCuenta = document.getElementById('numeroCuenta');
                     var selectNaturalezaCuenta = document.getElementById('naturalezaCuenta');
+                    var containerAllSeleccion = document.querySelector('.optionAll');
+                    var optionData = document.querySelector('.optionsData');
+                    var mensajeErrorInicial = document.querySelector('.mensajeErrorInicial');
                     var selectOptionSend;
                     var selecciones = [];
                     var resulAll = [];
 
-                    google.script.run.withSuccessHandler(function(result) {
-                            
-                        resulAll = result;
-                        result.forEach(function(elemento) {
-                        var fila = document.createElement('tr');
-                        var celda = document.createElement('td');
-                        celda.textContent = `${elemento.codigo} ${' '} ${elemento.nombre}`;
-                        celda.classList.add('celdaTabla');
-                        fila.appendChild(celda);
-                        fila.classList.add('filaTabla');
-                        fila.addEventListener('click', clickCell);
-                        tabla.appendChild(fila);
+                    var tiposCuenta = [
+                        { cod: 2, nombreTipo: 'Cuentas por Cobrar'},
+                        { cod: 1, nombreTipo: 'Cuentas por Pagar'},
+                        { cod: 3, nombreTipo: 'Bancos'},
+                        { cod: 4, nombreTipo: 'Patrimonio'},
+                        { cod: 5, nombreTipo: 'Gastos'},
+                        { cod: 6, nombreTipo: 'Activos Fijos'},
+                        { cod: 7, nombreTipo: 'Ingresos'},
+                        { cod: 8, nombreTipo: 'Costos de Producción'},
+                        { cod: 9, nombreTipo: 'Otros Activos'},
+                        { cod: 11, nombreTipo: 'Otros Pasivos'},
+                        { cod: 12, nombreTipo: 'Inventarios'},
+                        { cod: 13, nombreTipo: 'Caja'},
+                        { cod: 14, nombreTipo: 'Costos de Ventas'},
+                        { cod: 17, nombreTipo: 'Cuentas de Orden Deudores'},
+                        { cod: 18, nombreTipo: 'Cuentas de Orden Acreedores'},
+                        { cod: 20, nombreTipo: 'Depreciación'},
+                        { cod: 21, nombreTipo: 'Diferidos Activo'},
+                        { cod: 22, nombreTipo: 'Descuentos y Devoluciones Ventas'},
+                        { cod: 23, nombreTipo: 'Descuentos Condicionados'},
+                        { cod: 24, nombreTipo: 'Costo Materia Prima'},
+                        { cod: 25, nombreTipo: 'Costo Mano de Obra'},
+                        { cod: 26, nombreTipo: 'Costos Indirectos de Fabricación'},
+                        { cod: 27, nombreTipo: 'Costo Servicios Externos'},
+                        { cod: 28, nombreTipo: 'Diferidos Pasivo'},
+                        { cod: 29, nombreTipo: 'Presupuesto'},
+                        { cod: 30, nombreTipo: 'Valores'},
+                        { cod: 31, nombreTipo: 'Activos Intangibles'}, 
+                    ];
 
-                    });
-                        contenedorGlobal.style.display = 'flex';
-                        document.getElementById('loading').remove();
+                    contenedorGlobal.style.display = 'flex';
+                    containerAllSeleccion.style.display = 'none';
+                    mensajeErrorInicial.style.display = 'none';
+                    containerBase.style.display = 'none';
+                    optionData.style.display = 'none';
+                    document.getElementById('loading').remove();
 
-                        selectNaturalezaCuenta.innerHTML = '';
-
-                        var optionSelecciona = document.createElement('option');
+                    var optionSelecciona = document.createElement('option');
                         optionSelecciona.value = "";
                         optionSelecciona.text = "Selecciona";
                         optionSelecciona.disabled = true;
                         optionSelecciona.selected = true;
                         selectNaturalezaCuenta.insertBefore(optionSelecciona, selectNaturalezaCuenta.firstChild);
 
-                        var optionTodos = document.createElement('option');
-                        optionTodos.value = "todos";
-                        optionTodos.text = "Todos";
-                        selectNaturalezaCuenta.insertBefore(optionTodos, selectNaturalezaCuenta.children[1]);
+                    for (var i = 0; i < tiposCuenta.length; i++) {
+                        var option = document.createElement('option');
+                        option.value = tiposCuenta[i].nombreTipo;
+                        option.text = tiposCuenta[i].nombreTipo;
+                        selectNaturalezaCuenta.appendChild(option);
+                    }
 
-                        var addedValues = {};
-                        for (var i = 0; i < resulAll.length; i++) {
-                            if (!addedValues[resulAll[i].cuentaContableTipo.cuentaContableNaturaleza]) {
-                            var optionNaturaleza = document.createElement('option');
-                            optionNaturaleza.value = resulAll[i].cuentaContableTipo.id; 
-                            optionNaturaleza.text = resulAll[i].cuentaContableTipo.cuentaContableNaturaleza; 
-                            selectNaturalezaCuenta.appendChild(optionNaturaleza);
-                            addedValues[resulAll[i].cuentaContableTipo.cuentaContableNaturaleza] = true;
-                            }
-                        }
 
-                    }).getDataCuentaContable();
+                    // google.script.run.withSuccessHandler(function(result) {
+                            
+                    //     resulAll = result;
+                    //     result.forEach(function(elemento) {
+                    //     var fila = document.createElement('tr');
+                    //     var celda = document.createElement('td');
+                    //     celda.textContent = `${elemento.codigo} ${' '} ${elemento.nombre}`;
+                    //     celda.classList.add('celdaTabla');
+                    //     fila.appendChild(celda);
+                    //     fila.classList.add('filaTabla');
+                    //     fila.addEventListener('click', clickCell);
+                    //     tabla.appendChild(fila);
+
+                    // });
+                    //     contenedorGlobal.style.display = 'flex';
+                    //     document.getElementById('loading').remove();
+
+                    //     selectNaturalezaCuenta.innerHTML = '';
+
+                    //     var optionSelecciona = document.createElement('option');
+                    //     optionSelecciona.value = "";
+                    //     optionSelecciona.text = "Selecciona";
+                    //     optionSelecciona.disabled = true;
+                    //     optionSelecciona.selected = true;
+                    //     selectNaturalezaCuenta.insertBefore(optionSelecciona, selectNaturalezaCuenta.firstChild);
+
+                    //     var optionTodos = document.createElement('option');
+                    //     optionTodos.value = "todos";
+                    //     optionTodos.text = "Todos";
+                    //     selectNaturalezaCuenta.insertBefore(optionTodos, selectNaturalezaCuenta.children[1]);
+
+                    //     var addedValues = {};
+                    //     for (var i = 0; i < resulAll.length; i++) {
+                    //         if (!addedValues[resulAll[i].cuentaContableTipo.cuentaContableNaturaleza]) {
+                    //         var optionNaturaleza = document.createElement('option');
+                    //         optionNaturaleza.value = resulAll[i].cuentaContableTipo.id; 
+                    //         optionNaturaleza.text = resulAll[i].cuentaContableTipo.cuentaContableNaturaleza; 
+                    //         selectNaturalezaCuenta.appendChild(optionNaturaleza);
+                    //         addedValues[resulAll[i].cuentaContableTipo.cuentaContableNaturaleza] = true;
+                    //         }
+                    //     }
+
+                    // }).getDataCuentaContable();
                     
+                    // selectNaturalezaCuenta.addEventListener('change', function() {
+                    //     resulAll = [];
+                    //     numeroCuenta.value = null;
+                    //     containerAllSeleccion.style.display = 'none';
+                    //     containerBase.style.display = 'none';
+                    //     optionData.style.display = 'none';
+
+                    // });
+
                     selectNaturalezaCuenta.addEventListener('change', function() {
-                        var selectedOptionText = this.options[this.selectedIndex].text;
+                        // Este código se ejecutará cada vez que el valor del select cambie
+                        console.log('El valor del select ha cambiado a: ' + this.value);
 
 
-                        resulAll = resulAll.filter(function(elemento) {
-                            return elemento.cuentaContableTipo.cuentaContableNaturaleza == selectedOptionText;
-                        });
+                        numeroCuenta.value = null;
+                        containerAllSeleccion.style.display = 'none';
+                        containerBase.style.display = 'none';
+                        optionData.style.display = 'none';
+
+                        google.script.run.deletePropertyCuentaContable();
 
                     });
+
+                    function guardarValidacionInicial(){
+
+                        if(numeroCuenta.value || selectNaturalezaCuenta.value){
+                        
+                        // mensajeError.style.display = 'none';
+                        var seleccionCuentaSelect = {
+                            categoriaDocumento: selectNaturalezaCuenta.value,
+                            numeroCuenta: numeroCuenta.value,
+                        };
+
+                        google.script.run.guardarSeleccionGeneralCuenta(seleccionCuentaSelect);
+                            return true;
+                        }else{
+                            return false;
+                        }
+                    }
+
+                    numeroCuenta.onchange = guardarValidacionInicial;
+                    selectNaturalezaCuenta.onchange = guardarValidacionInicial;
+
+
+                    function consultaDataInicial(){
+                        var camposValidados = guardarValidacionInicial();
+                        console.log(camposValidados);
+                        if(camposValidados){  
+                            mensajeErrorInicial.style.display = 'flex';
+                            google.script.run.withSuccessHandler(function(result) {
+
+                                google.script.run.withSuccessHandler(function(result) {
+                                    console.log(result);
+                                    if(result.length > 0){
+                                        resulAll = [];
+                                        mensajeErrorInicial.style.display = 'none';
+                                        containerBase.style.display = 'flex';
+                                        containerAllSeleccion.style.display = 'flex';
+                                        optionData.style.display = 'block';
+
+                                        resulAll = result;
+                                        resulAll.forEach(function(elemento) {
+                                            var fila = document.createElement('tr');
+                                            var celda = document.createElement('td');
+                                            celda.textContent = `${elemento.codigo} ${' '} ${elemento.nombre}`;
+                                            celda.classList.add('celdaTabla');
+                                            fila.appendChild(celda);
+                                            fila.classList.add('filaTabla');
+                                            fila.addEventListener('click', clickCell);
+                                            tabla.appendChild(fila);
+
+                                        });
+
+                                    }
+                                    
+
+                                }).getDataCuentaContable();
+                        
+                            }).withFailureHandler(function(error) {
+                                google.script.host.close();
+                            }).consultaCuentasInicial();
+                        }
+
+                    }
 
                     document.getElementById('addAllCheckbox').addEventListener('change', function(e) {
                         if (e.target.checked) {

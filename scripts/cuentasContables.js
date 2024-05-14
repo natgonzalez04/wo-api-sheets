@@ -5,7 +5,7 @@ var ui = SpreadsheetApp.getUi();
 var payload = {
     "columnaOrdenar": "id",
     "pagina": 0,
-    "registrosPorPagina": 1000,
+    "registrosPorPagina": 4000,
     "orden": "DESC",
     "filtros": [],
     "canal": 0,
@@ -17,41 +17,133 @@ var payload = {
 function listarCuentasContables(){
 
     var selectListarCuentasContables = 'listarCuentasContables';
+    viewGeneralCuentasContables(selectListarCuentasContables);
 
-    var claveAPI = almacenamientoClave();
+    // var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://api.worldoffice.cloud/api/v1/cuentasContables/listarCuentaContable';
+    // var apiUrl = 'https://api.worldoffice.cloud/api/v1/cuentasContables/listarCuentaContable';
     
-    var headers = {
-        'Content-Type': 'application/json',
-        'Authorization': claveAPI,
-    };
+    // var headers = {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': claveAPI,
+    // };
 
-    var options = {
-        'method': 'post',
-        'headers': headers,
-        'payload': JSON.stringify(payload),
-        'muteHttpExceptions': true
-    };
+    // var options = {
+    //     'method': 'post',
+    //     'headers': headers,
+    //     'payload': JSON.stringify(payload),
+    //     'muteHttpExceptions': true
+    // };
     
-    var response = UrlFetchApp.fetch(apiUrl, options);
-    Logger.log(response);
-    Logger.log(response.length);
+    // var response = UrlFetchApp.fetch(apiUrl, options);
+    // Logger.log(response);
+    // Logger.log(response.length);
 
-    if (response.getResponseCode() === 200) {
-        var responseData = response.getContentText();
-        var jsonData = JSON.parse(responseData);
-        var content = jsonData.data.content.slice(0,200);
-        Logger.log(content);
-        viewGeneralCuentasContables(selectListarCuentasContables);
-        var scriptPropertiesCuentasContables = PropertiesService.getDocumentProperties();
-        scriptPropertiesCuentasContables.setProperty('contentCuentaContable', JSON.stringify(content));
+    // if (response.getResponseCode() === 200) {
+    //     var responseData = response.getContentText();
+    //     var jsonData = JSON.parse(responseData);
+    //     var content = jsonData.data.content.slice(0,200);
+    //     Logger.log(content);
+    //     viewGeneralCuentasContables(selectListarCuentasContables);
+    //     var scriptPropertiesCuentasContables = PropertiesService.getDocumentProperties();
+    //     scriptPropertiesCuentasContables.setProperty('contentCuentaContable', JSON.stringify(content));
+    // } 
+    // else 
+    // {
+    //     var errorResponse = response.getContentText();
+    //     Logger.log("Error response: " + errorResponse);
+    // }
+}
+
+function consultaCuentasInicial(){
+    var datosString = PropertiesService.getDocumentProperties().getProperty('dataDocumentoGeneralCuenta');
+    var datos = JSON.parse(datosString);
+    Logger.log(datos);
+
+    var categoria = datos.categoriaDocumento
+    var numeroCuenta = datos.numeroCuenta
+
+    if(categoria){
+        var claveAPI = almacenamientoClave();
+
+        var apiUrl = 'https://api.worldoffice.cloud/api/v1/cuentasContables/listarCuentaContable';
+
+        var payloadContable = {
+            "columnaOrdenar": "codigo",
+            "pagina": 0,
+            "registrosPorPagina": 2000,
+            "orden": "DESC",
+            "filtros": [
+                {
+                    "atributo": "cuentaContableTipo.nombre",
+                    "valor": categoria,
+                    "valor2": null,
+                    "tipoFiltro": 1,
+                    "tipoDato": 0,
+                    "nombreColumna": "Tipo",
+                    "valores": null,
+                    "clase": null,
+                    "operador": 0,
+                    "subGrupo": "filtro"
+                },
+                {
+                    "atributo": "senActivo",
+                    "tipoDato": 1,
+                    "nombreColumna": "Activo",
+                    "tipoFiltro": 0,
+                    "valor": true,
+                    "operador": 0
+                }
+            ],
+            "canal": 0,
+            "registroInicial": 0
+        };
+        
+        var headers = {
+            'Content-Type': 'application/json',
+            'Authorization': claveAPI,
+        };
+
+        var options = {
+            'method': 'post',
+            'headers': headers,
+            'payload': JSON.stringify(payloadContable),
+            'muteHttpExceptions': true
+        };
+        
+        var response = UrlFetchApp.fetch(apiUrl, options);
+        Logger.log(response);
+        Logger.log(response.length);
+        Logger.log(response.getResponseCode());
+
+        if (response.getResponseCode() === 200) {
+            var responseData = response.getContentText();
+            var jsonData = JSON.parse(responseData);
+            var content = jsonData.data.content;
+            Logger.log(content);
+
+            var scriptPropertiesCuentasContables = PropertiesService.getDocumentProperties();
+            scriptPropertiesCuentasContables.setProperty('contentCuentaContable', JSON.stringify(content));
+
+            PropertiesService.getDocumentProperties().setProperty('dataDocumentoGeneralCuenta', '');
+        } 
+        else 
+        {
+            PropertiesService.getDocumentProperties().setProperty('dataDocumentoGeneralCuenta', '');
+            var errorResponse = response.getContentText();
+            Logger.log("Error response: " + errorResponse);
+        }
+    }else if(numeroCuenta){
+
     } 
-    else 
-    {
-        var errorResponse = response.getContentText();
-        Logger.log("Error response: " + errorResponse);
-    }
+
+    PropertiesService.getDocumentProperties().setProperty('dataDocumentoGeneralCuenta', '');
+
+}
+
+function guardarSeleccionGeneralCuenta(seleccion) {
+    var documentoGeneralCuenta = JSON.stringify(seleccion);
+    PropertiesService.getDocumentProperties().setProperty('dataDocumentoGeneralCuenta', documentoGeneralCuenta);
 }
 
 function guardarSeleccionCuentaContable(seleccion) {
@@ -70,10 +162,15 @@ function getDataCuentaContable() {
     return JSON.parse(contentDataCuentaContable);
 }
 
+function deletePropertyCuentaContable() {
+    var scriptProperties = PropertiesService.getDocumentProperties();
+    scriptProperties.deleteProperty('contentCuentaContable');
+}
+
 function mostrarDatosCeldaCuentaContable() {
-    var selectOption = PropertiesService.getUserProperties().getProperty('optionDataCuentaContable');
-    var option = JSON.parse(selectOption);
-    Logger.log(option);
+    // var selectOption = PropertiesService.getUserProperties().getProperty('optionDataCuentaContable');
+    // var option = JSON.parse(selectOption);
+    // Logger.log(option);
     var datosString = PropertiesService.getUserProperties().getProperty('seleccionCeldaCuentaContable');
     var datos = JSON.parse(datosString);
     datos = datos.flat(); 
@@ -128,7 +225,7 @@ function viewGeneralCuentasContables(select){
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
         .setWidth(720)
-        .setHeight(500);
+        .setHeight(610);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Listar Cuentas Contables');
     }
 

@@ -1117,7 +1117,7 @@ function mostrarDatosConsultaDocumentoVenta() {
 
 }
 
-////////////////////// Enviar documento compra por Email //////////////////////
+////////////////////// Enviar documento por Email //////////////////////
 
 function consultarEnvioEmailDocumento(){
     var enviarEmailDocumento = 'enviarEmailDocumento';
@@ -1146,7 +1146,7 @@ function viewGeneralDocumentos(select){
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
         .setWidth(720)
-        .setHeight(600);
+        .setHeight(620);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Enviar documento por email');
     }
 

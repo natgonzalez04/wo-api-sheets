@@ -1250,91 +1250,91 @@ function viewGeneral(select){
         var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-unidades.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(400)
+        .setWidth(420)
         .setHeight(370);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Unidades de medida');
     }else if(select == 'monedas'){
         var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-monedas.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(400)
+        .setWidth(420)
         .setHeight(370);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Monedas');
     }else if(select == 'formaPago'){
         var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-forma-pago.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(400)
+        .setWidth(420)
         .setHeight(370);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Formas de pago');
     }else if(select == 'empresas'){
         var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-empresas.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(400)
+        .setWidth(420)
         .setHeight(370);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Empresas');
     }else if(select == 'bancos'){
         var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-bancos.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(400)
+        .setWidth(420)
         .setHeight(370);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Bancos');
     }else if(select == 'tipoDocumento'){
         var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-tipo-documento.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(400)
+        .setWidth(420)
         .setHeight(370);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Tipos de documento');
     }else if(select == 'ciudades'){
         var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-ciudades.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(400)
+        .setWidth(420)
         .setHeight(370);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Ciudades');
     }else if(select == 'centroCostos'){
         var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-centro-costo.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(400)
+        .setWidth(420)
         .setHeight(370);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Centros de costos');
     }else if(select == 'tipoCuenta'){
         var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-tipo-cuenta.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(400)
+        .setWidth(420)
         .setHeight(320);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Tipos de cuenta');
     }else if(select == 'genero'){
         var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-genero.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(400)
+        .setWidth(420)
         .setHeight(320);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Generos');
     }else if(select == 'estadoCivil'){
         var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-estado-civil.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(400)
+        .setWidth(420)
         .setHeight(370);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Estado civil');
     }else if(select == 'prefijos'){
         var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-prefijos.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(400)
+        .setWidth(420)
         .setHeight(370);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Prefijos');
     }else if(select == 'paises'){
         var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/catalogo/catalogo-paises.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(400)
+        .setWidth(420)
         .setHeight(370);
         SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Paises');
     }

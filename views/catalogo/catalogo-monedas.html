@@ -41,6 +41,9 @@
                             </div>
                         </form>
                     </section>
+                    <div class="mensajeErrorSinConsulta">
+                        <span>Por favor, selecciona al menos una moneda</span>
+                    </div>
                     <button type="button" class="buttonImport" onclick="sendDataSelected()">Agregar</button>
                 </section>
             </section>
@@ -66,6 +69,7 @@
                     var optionsExit = document.getElementsByName('option');
                     var optionChecked = document.querySelector('input[name="option"]:checked');
                     var contenedorGlobal = document.querySelector('.containerCatalogoBase');
+                    var mensajeErrorSinConsulta = document.querySelector('.mensajeErrorSinConsulta');
                     var selectOptionSend;
                     var selecciones = [];
                     var resulAll = [];
@@ -132,14 +136,20 @@
                             evento.target.classList.remove('selectedCelda');
                         } else {
                             selecciones.push(seleccion);
+                            mensajeErrorSinConsulta.style.display = 'none';
                             evento.target.classList.add('selectedCelda');
                         }
                         google.script.run.guardarSeleccionMoneda(selecciones);
                     }
 
                     function sendDataSelected() {
-                        google.script.run.mostrarDatosCeldaMoneda();
-                        google.script.host.close();
+                        if(selecciones.length === 0) {
+                            mensajeErrorSinConsulta.style.display = 'flex';
+                        }else{
+                            google.script.run.mostrarDatosCeldaMoneda();
+                            google.script.host.close();
+                        }
+
                     }
 
             </script>

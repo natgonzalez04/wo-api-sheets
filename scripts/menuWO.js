@@ -9,9 +9,9 @@ function onOpen(){
 
 function mostrarPaginaPrincipal() {
     var htmlOutput = HtmlService.createHtmlOutputFromFile('views/login.html')
-        .setWidth(400)
-        .setHeight(330);
-    SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Bienvenido a World Office Cloud Api');
+        .setWidth(420)
+        .setHeight(370);
+    SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Bienvenido a World Office API');
 }
 
 function guardarClaveAPI(clave) {
@@ -94,7 +94,8 @@ function activarOpciones(){
     .addItem('Listar cuentas contables', 'listarCuentasContables');
 
     var Contabilidad = ui.createMenu('Contabilidad')
-    .addItem('Consultar documentos contabilidad', 'consultarDocumentoContabilidad');
+    .addItem('Consultar documentos contabilidad', 'consultarDocumentoContabilidad')
+    .addItem('Formas de pago', 'listarFormasPagoContabilidad');
 
     var menu = ui.createMenu('World Office');
     menu.addItem('Ver Token', 'mostrarClaveAPI')

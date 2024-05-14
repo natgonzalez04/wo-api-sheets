@@ -12,23 +12,26 @@
             <section class="containerCatalogoBase">
 
                 <section class="titleCatalogo">
-                    <span>Diligencia los campos requeridos para realizar el envio de tu documento</span>
+                    <span>Diligencia los campos requeridos para realizar el envio por email de los siguientes documentos de venta, documentos de compra y contabilidad.</span>
                 </section>
 
                 <section class="observacionesInfo">
                     <h4>Para tener en cuenta</h4>
                     <ul>
-                        <li>
-                            Podras enviar por email los siguientes documentos de venta factura de venta, nota credito venta, nota debito venta, remision de ventas, cotización y pedido.
+                        <li> 
+                            <strong>Documentos de venta:</strong> factura de venta, nota credito venta, nota debito venta, remision de ventas, cotización y pedido.
                         </li>
                         <li>
-                            Podras enviar por email los siguientes documentos de compra factura de compra, nota credito compra, nota debito compra, remision de compra, orden Compra y devoluciones de remisiones de Compra.
+                            <strong>Documentos de compra:</strong> factura de compra, nota credito compra, nota debito compra, remision de compra, orden Compra y devoluciones de remisiones de Compra.
+                        </li>
+                        <li>
+                            <strong>Documentos de contabilidad:</strong> comprobante de egreso, recibo de caja y nota de contabilidad.
                         </li>
                     </ul>
                 </section>
 
                 <div class="containerAllInformacion">
-                    <button type="button" onclick="mostrarOpcionesConsulta()" style="margin: 0 5px 10px 0;">Ver Informacion de consulta 
+                    <button type="button" id="mostrarOpcionesConsulta" style="margin: 0 5px 10px 0;">Ver Informacion de consulta 
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#5a5a5a" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
                             <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
                         </svg>
@@ -194,6 +197,7 @@
                 var numeroDocumento = document.getElementById('numeroDocumento');
                 var btnEnvioGeneral = document.getElementById('buttonImport');
                 var contenedorButtonConsulta = document.getElementById('contenedorButtonConsulta');
+                var buttonMostrarOpcionesConsulta = document.getElementById('mostrarOpcionesConsulta');
                 var tabla = document.getElementById('miTabla');
                 var optionsExit = document.getElementsByName('option');
                 var optionChecked = document.querySelector('input[name="option"]:checked');
@@ -364,6 +368,24 @@
                     infoSubtitle.style.display = 'none';
                     btnEnvioGeneral.style.display = 'none';
                 }
+
+                buttonMostrarOpcionesConsulta.addEventListener('click', function() {
+
+                    if (containerConsultaDocumento.style.display == 'none' && contenedorButtonConsulta.style.display == 'none') {
+                        containerConsultaDocumento.style.display = 'flex';
+                        contenedorButtonConsulta.style.display = 'flex';
+                        contenedorInfoEmail.style.display = 'none';
+                        infoSubtitle.style.display = 'none';
+                        btnEnvioGeneral.style.display = 'none';
+                    } else {
+
+                        containerConsultaDocumento.style.display = 'none';
+                        contenedorButtonConsulta.style.display = 'none';
+                        contenedorInfoEmail.style.display = 'flex';
+                        infoSubtitle.style.display = 'flex';
+                        btnEnvioGeneral.style.display = 'block';
+                    }
+                });
 
 
                 var docVentas = ['FACTURA DE VENTA', 'NOTA CREDITO VENTA', 'NOTA DEBITO VENTA', 'REMISION DE VENTAS', 'COTIZACION', 'PEDIDO'];

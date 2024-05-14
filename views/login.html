@@ -29,7 +29,6 @@
             width: 30vw;
             margin-left: 30%;
             margin-top: 30px;
-            filter: drop-shadow(0 0 0.75rem #0d95f0);
         }
         .tokenLogin{
             width: 60vw;
@@ -96,25 +95,36 @@
             color: #0d95f0;
         }
 
+        .ayudaToken{
+            text-decoration: none;
+            font-size: 12px;
+            width: 100%;
+            direction: rtl;
+            padding: 5px 20px 0 0;
+            color: #5e5e5e;
+        }
+
         @keyframes spinner-grow {
-        0% {
-            transform: scale(0);
-        }
-        50% {
-            opacity: 1;
-            transform: scale(0.5);
-        }
-        100% {
-            opacity: 0;
-            transform: none;
-        }
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(0.5);
+            }
+            100% {
+                opacity: 0;
+                transform: none;
+            }
         } 
+        
+        
         </style>
     </head>
     <body>
         <section class="containerLogin" id="containerLogin">
 
-            <img class="logo" src="https://www.worldoffice.cloud/assets/images/logoLogin.png" alt="World Office Cloud logo">
+            <img class="logo" src="https://www.worldoffice.cloud/assets/images/logoWOCloud.png" alt="World Office Cloud logo">
 
             <form id="apiConfigForm" autocomplete="off" class="containerLogin" style="margin-left: 10px;">
                 
@@ -124,6 +134,7 @@
                     <button type="reset" class="btn-reset">x</button>
                 </div>
                 <span id="mensajeError">Ingresa tu token para acceder</span>
+                <a class="ayudaToken" target="_blank" href="https://developer.worldoffice.cloud/guiaInterfaz.html"><strong>?Aún no tienes token¿</strong></a>
                 <button type="button" class="buttonLogin" onclick="enviarDatosApi()">Iniciar</button>
             </form>
         </section>
