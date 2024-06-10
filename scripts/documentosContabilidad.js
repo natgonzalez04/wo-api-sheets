@@ -12,26 +12,26 @@ var payload = {
     "registroInicial": 0
 };
 
-////////////////////// Listar Documento Compras //////////////////////
+////////////////////// Listar Documento Contabilidad //////////////////////
 
-function listarDocumentosCompra(){
-    var selectListarDocCompras = 'listarDocCompras';
-    viewGeneralDocumentosCompra(selectListarDocCompras);
+function listarDocumentosContabilidad(){
+    var selectListarDocContabilidad = 'listarDocContabilidad';
+    viewGeneralDocumentosContables(selectListarDocContabilidad);
 }
 
-function guardarSeleccionPaginadoDocumentosCompra(seleccion) {
+function guardarSeleccionPaginadoDocumentosContabilidad(seleccion) {
     var seleccionPaginadoDoc = JSON.stringify(seleccion);
-    PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', seleccionPaginadoDoc);
+    PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosContabilidad', seleccionPaginadoDoc);
 }
 
-function validacionInicialCompra(){
-    var tipoDocumentoSeleccionado = PropertiesService.getDocumentProperties().getProperty('seleccionPaginadoDocumentosCompra');
+function validacionInicialContabilidad(){
+    var tipoDocumentoSeleccionado = PropertiesService.getDocumentProperties().getProperty('seleccionPaginadoDocumentosContabilidad');
     var datosSelect = JSON.parse(tipoDocumentoSeleccionado);
     Logger.log(datosSelect.tipoDocumento);
     if(datosSelect != null){
         var claveAPI = almacenamientoClave();
 
-        var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+        var apiUrl = 'https://api.worldoffice.cloud/api/v1/contabilidad/listarDocContable'
 
         var payloadInicial = {
             "columnaOrdenar": "id",
@@ -77,24 +77,24 @@ function validacionInicialCompra(){
             var totalRegistros = jsonData.data.totalElements;
             Logger.log(totalRegistros);
             var scriptPropertiesTotalRegistros = PropertiesService.getScriptProperties();
-            scriptPropertiesTotalRegistros.setProperty('contentTotalRegistrosCompra', JSON.stringify(totalRegistros));
+            scriptPropertiesTotalRegistros.setProperty('contentTotalRegistrosContabilidad', JSON.stringify(totalRegistros));
         }
     }
 
 }
 
-function getDataTotalRegistrosCompra() {
+function getDataTotalRegistrosContabilidad() {
     var scriptProperties = PropertiesService.getScriptProperties();
-    var contentDataTotalRegistros = scriptProperties.getProperty('contentTotalRegistrosCompra');
+    var contentDataTotalRegistros = scriptProperties.getProperty('contentTotalRegistrosContabilidad');
     return JSON.parse(contentDataTotalRegistros);
 }
 
-function mostraDocumentosCompra(){
-    var datosString = PropertiesService.getDocumentProperties().getProperty('seleccionPaginadoDocumentosCompra');
+function mostraDocumentosContabilidad(){
+    var datosString = PropertiesService.getDocumentProperties().getProperty('seleccionPaginadoDocumentosContabilidad');
     var datos = JSON.parse(datosString);
     Logger.log(datos);
     var tipoDoc = datos.tipoDocumento;
-    var totalRegistros = getDataTotalRegistrosCompra();
+    var totalRegistros = getDataTotalRegistrosContabilidad();
     Logger.log(totalRegistros);
     var paginas = totalRegistros >= 2000 ? Math.ceil(totalRegistros / 2000) : 1;
     var pag = 0;
@@ -110,7 +110,7 @@ function mostraDocumentosCompra(){
     if(datos.registrosCompletos == true){
         for (var i = 0; i < paginas; i++) {
             var datoInicial = i * 2000;
-            listarRegistroCompletosCompra(tipoDoc, datoInicial,pag)
+            listarRegistroCompletosContabilidad(tipoDoc, datoInicial,pag)
             pag++;
             if (pag == paginas) {
                 procesoTerminado = true;
@@ -118,22 +118,19 @@ function mostraDocumentosCompra(){
             }
         }
     }else if(datos.registroInicial && datos.registroFinal){
-        listarRegistroFechaCompra(tipoDoc, fechaInicial, fechaFin);
+        listarRegistroFechaContabilidad(tipoDoc, fechaInicial, fechaFin);
         procesoTerminado = true;
     }else if(datos.numeroInicial && datos.numeroFinal){
-        listarRegistroNumeroCompra(tipoDoc, numeroInicial, numeroFinal);
+        listarRegistroNumeroContabilidad(tipoDoc, numeroInicial, numeroFinal);
         procesoTerminado = true;
     }else if(datos.prefijo){
-        listarRegistroPrefijoCompra(tipoDoc, prefijoSelect);
+        listarRegistroPrefijoContabilidad(tipoDoc, prefijoSelect);
         procesoTerminado = true;
     }else if(datos.tercero && tipoTercero == 'empresa'){
-        listarRegistroTerceroEmpresaCompra(tipoDoc, tercero);
+        listarRegistroTerceroEmpresaContabilidad(tipoDoc, tercero);
         procesoTerminado = true;
-    }else if(datos.tercero && tipoTercero == 'proveedor'){
-        listarRegistroTerceroProveedor(tipoDoc, tercero);
-        procesoTerminado = true;
-    }else if(datos.tercero && tipoTercero == 'comprador'){
-        listarRegistroTerceroComprador(tipoDoc, tercero);
+    }else if(datos.tercero && tipoTercero == 'beneficiario'){
+        listarRegistroTerceroBeneficiario(tipoDoc, tercero);
         procesoTerminado = true;
     }
     
@@ -141,11 +138,11 @@ function mostraDocumentosCompra(){
     return procesoTerminado;
 }
 
-function listarRegistroCompletosCompra(documento, inicial, pagina){
+function listarRegistroCompletosContabilidad(documento, inicial, pagina){
 
     var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/contabilidad/listarDocContable'
 
     var payloadFV = {
         "columnaOrdenar": "fecha,id",
@@ -187,6 +184,8 @@ function listarRegistroCompletosCompra(documento, inicial, pagina){
     Logger.log(response);
     Logger.log(response.length);
 
+    Logger.log(response.getResponseCode());
+
     var registrosContador = pagina * 2000;
 
     if (response.getResponseCode() === 200) {
@@ -209,9 +208,8 @@ function listarRegistroCompletosCompra(documento, inicial, pagina){
             "prefijo": "Prefijo",
             "numero": "Número",
             "empresa": "Empresa",
-            "terceroExterno": "Proveedor",
-            "terceroInterno": "Comprador",
-            "formaPago": "Forma de Pago",
+            "terceroExterno": documento == 'CE' ? "Beneficiario" : "Recibido de",
+            "terceroInterno": documento == 'NC' ? "Tercero" : "Elaborado por",
             "concepto": "Concepto",
         };
 
@@ -235,19 +233,19 @@ function listarRegistroCompletosCompra(documento, inicial, pagina){
             }
         }
 
-        PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+        PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosContabilidad', '');
     } else {
-        PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+        PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosContabilidad', '');
         var errorResponse = response.getResponseCode();
         Logger.log("Error response: " + errorResponse);
         mapeoErroresDocumento(errorResponse);
     }
 }
 
-function listarRegistroFechaCompra(documento, fechaInicial, fechaFin){
+function listarRegistroFechaContabilidad(documento, fechaInicial, fechaFin){
     var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/contabilidad/listarDocContable'
     
     var payloadDoc = {
             "columnaOrdenar": "fecha,id",
@@ -312,9 +310,8 @@ function listarRegistroFechaCompra(documento, fechaInicial, fechaFin){
                 "prefijo": "Prefijo",
                 "numero": "Número",
                 "empresa": "Empresa",
-                "terceroExterno": "Proveedor",
-                "terceroInterno": "Comprador",
-                "formaPago": "Forma de Pago",
+                "terceroExterno": documento == 'CE' ? "Beneficiario" : "Recibido de",
+                "terceroInterno": documento == 'NC' ? "Tercero" : "Elaborado por",
                 "concepto": "Concepto",
             };
     
@@ -337,9 +334,9 @@ function listarRegistroFechaCompra(documento, fechaInicial, fechaFin){
                     j++;
                 }
             }
-            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosContabilidad', '');
         } else {
-            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosContabilidad', '');
             var errorResponse = response.getResponseCode();
             Logger.log("Error response: " + errorResponse);
             mapeoErroresDocumento(errorResponse);
@@ -348,10 +345,10 @@ function listarRegistroFechaCompra(documento, fechaInicial, fechaFin){
     
 }
 
-function listarRegistroNumeroCompra(documento, numeroInicial,numeroFin){
+function listarRegistroNumeroContabilidad(documento, numeroInicial,numeroFin){
     var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/contabilidad/listarDocContable'
     
     var payloadDoc = {
             "columnaOrdenar": "fecha,id",
@@ -416,9 +413,8 @@ function listarRegistroNumeroCompra(documento, numeroInicial,numeroFin){
                 "prefijo": "Prefijo",
                 "numero": "Número",
                 "empresa": "Empresa",
-                "terceroExterno": "Proveedor",
-                "terceroInterno": "Comprador",
-                "formaPago": "Forma de Pago",
+                "terceroExterno": documento == 'CE' ? "Beneficiario" : "Recibido de",
+                "terceroInterno": documento == 'NC' ? "Tercero" : "Elaborado por",
                 "concepto": "Concepto",
             };
     
@@ -441,9 +437,9 @@ function listarRegistroNumeroCompra(documento, numeroInicial,numeroFin){
                     j++;
                 }
             }
-            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosContabilidad', '');
         } else {
-            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosContabilidad', '');
             var errorResponse = response.getResponseCode();
             Logger.log("Error response: " + errorResponse);
             mapeoErroresDocumento(errorResponse);
@@ -452,10 +448,10 @@ function listarRegistroNumeroCompra(documento, numeroInicial,numeroFin){
     
 }
 
-function listarRegistroPrefijoCompra(documento, prefijo){
+function listarRegistroPrefijoContabilidad(documento, prefijo){
     var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/contabilidad/listarDocContable'
     
     var payloadDoc = {
             "columnaOrdenar": "fecha,id",
@@ -519,9 +515,8 @@ function listarRegistroPrefijoCompra(documento, prefijo){
                 "prefijo": "Prefijo",
                 "numero": "Número",
                 "empresa": "Empresa",
-                "terceroExterno": "Proveedor",
-                "terceroInterno": "Comprador",
-                "formaPago": "Forma de Pago",
+                "terceroExterno": documento == 'CE' ? "Beneficiario" : "Recibido de",
+                "terceroInterno": documento == 'NC' ? "Tercero" : "Elaborado por",
                 "concepto": "Concepto",
             };
     
@@ -544,9 +539,9 @@ function listarRegistroPrefijoCompra(documento, prefijo){
                     j++;
                 }
             }
-            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosContabilidad', '');
         } else {
-            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosContabilidad', '');
             var errorResponse = response.getResponseCode();
             Logger.log("Error response: " + errorResponse);
             mapeoErroresDocumento(errorResponse);
@@ -555,10 +550,10 @@ function listarRegistroPrefijoCompra(documento, prefijo){
     
 }
 
-function listarRegistroTerceroEmpresaCompra(documento, empresa){
+function listarRegistroTerceroEmpresaContabilidad(documento, empresa){
     var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/contabilidad/listarDocContable'
     
     var payloadDoc = {
             "columnaOrdenar": "fecha,id",
@@ -622,12 +617,11 @@ function listarRegistroTerceroEmpresaCompra(documento, empresa){
                 "prefijo": "Prefijo",
                 "numero": "Número",
                 "empresa": "Empresa",
-                "terceroExterno": "Proveedor",
-                "terceroInterno": "Comprador",
-                "formaPago": "Forma de Pago",
+                "terceroExterno": documento == 'CE' ? "Beneficiario" : "Recibido de",
+                "terceroInterno": documento == 'NC' ? "Tercero" : "Elaborado por",
                 "concepto": "Concepto",
             };
-    
+
             var j = 0;
             for (var key in keys) {
                 var headerCell = celdaActiva.offset(0, j);
@@ -647,9 +641,9 @@ function listarRegistroTerceroEmpresaCompra(documento, empresa){
                     j++;
                 }
             }
-            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosContabilidad', '');
         } else {
-            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosContabilidad', '');
             var errorResponse = response.getResponseCode();
             Logger.log("Error response: " + errorResponse);
             mapeoErroresDocumento(errorResponse);
@@ -658,10 +652,10 @@ function listarRegistroTerceroEmpresaCompra(documento, empresa){
     
 }
 
-function listarRegistroTerceroProveedor(documento, proveedor){
+function listarRegistroTerceroBeneficiario(documento, beneficiario){
     var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+    var apiUrl = 'https://api.worldoffice.cloud/api/v1/contabilidad/listarDocContable'
     
     var payloadDoc = {
             "columnaOrdenar": "fecha,id",
@@ -684,9 +678,9 @@ function listarRegistroTerceroProveedor(documento, proveedor){
                 {
                     "atributo": "terceroExterno.nombreCompleto",
                     "tipoDato": 0,
-                    "nombreColumna": "Proveedor",
+                    "nombreColumna": "Beneficiario",
                     "tipoFiltro": 1,
-                    "valor": proveedor,
+                    "valor": beneficiario,
                     "operador": 0
                 },
             ],
@@ -725,9 +719,8 @@ function listarRegistroTerceroProveedor(documento, proveedor){
                 "prefijo": "Prefijo",
                 "numero": "Número",
                 "empresa": "Empresa",
-                "terceroExterno": "Proveedor",
-                "terceroInterno": "Comprador",
-                "formaPago": "Forma de Pago",
+                "terceroExterno": documento == 'CE' ? "Beneficiario" : "Recibido de",
+                "terceroInterno": documento == 'NC' ? "Tercero" : "Elaborado por",
                 "concepto": "Concepto",
             };
     
@@ -750,9 +743,9 @@ function listarRegistroTerceroProveedor(documento, proveedor){
                     j++;
                 }
             }
-            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosContabilidad', '');
         } else {
-            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
+            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosContabilidad', '');
             var errorResponse = response.getResponseCode();
             Logger.log("Error response: " + errorResponse);
             mapeoErroresDocumento(errorResponse);
@@ -761,123 +754,22 @@ function listarRegistroTerceroProveedor(documento, proveedor){
     
 }
 
-function listarRegistroTerceroComprador(documento, comprador){
-    var claveAPI = almacenamientoClave();
 
-    var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
-    
-    var payloadDoc = {
-            "columnaOrdenar": "fecha,id",
-            "pagina": 0,
-            "registrosPorPagina": 5000,
-            "orden": "DESC",
-            "filtros": [
-                {
-                    "atributo": "documentoTipo.codigoDocumento",
-                    "valor": documento,
-                    "valor2": null,
-                    "tipoFiltro": 0,
-                    "tipoDato": 0,
-                    "nombreColumna": null,
-                    "valores": null,
-                    "clase": null,
-                    "operador": 0,
-                    "subGrupo": "filtro"
-                },
-                {
-                    "atributo": "terceroInterno.nombreCompleto",
-                    "tipoDato": 0,
-                    "nombreColumna": "Comprador",
-                    "tipoFiltro": 1,
-                    "valor": comprador,
-                    "operador": 0
-                },
-            ],
-            "canal": 0,
-            "registroInicial": 0
-        };
-    
-    
-        var headers = {
-            'Content-Type': 'application/json',
-            'Authorization': claveAPI,
-        };
-    
-        var options = {
-            'method': 'post',
-            'headers': headers,
-            'payload': JSON.stringify(payloadDoc),
-            'muteHttpExceptions': true
-        };
-    
-        var response = UrlFetchApp.fetch(apiUrl, options);
-        Logger.log(response);
-        Logger.log(response.length);
-    
-        if (response.getResponseCode() === 200) {
-            var responseData = response.getContentText();
-            var jsonData = JSON.parse(responseData);
-            var content = jsonData.data.content;
-            Logger.log(content.length);
-            var hojaActiva = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-            var celdaActiva = hojaActiva.getActiveCell();
-    
-            var keys = {
-                "id": "Id",
-                "fecha": "Fecha",
-                "prefijo": "Prefijo",
-                "numero": "Número",
-                "empresa": "Empresa",
-                "terceroExterno": "Proveedor",
-                "terceroInterno": "Comprador",
-                "formaPago": "Forma de Pago",
-                "concepto": "Concepto",
-            };
-    
-            var j = 0;
-            for (var key in keys) {
-                var headerCell = celdaActiva.offset(0, j);
-                headerCell.setValue(keys[key]);
-                j++;
-            }
-    
-            for (var i = 0; i < content.length; i++) {
-                j = 0;
-                for (var key in keys) {
-                    var cell = celdaActiva.offset(i + 1, j);
-                    if(key == 'id'){
-                        cell.setValue(String(content[i][key]));
-                    }else{
-                        cell.setValue(content[i][key]);
-                    }
-                    j++;
-                }
-            }
-            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
-        } else {
-            PropertiesService.getDocumentProperties().setProperty('seleccionPaginadoDocumentosCompra', '');
-            var errorResponse = response.getResponseCode();
-            Logger.log("Error response: " + errorResponse);
-            mapeoErroresDocumento(errorResponse);
-        }
-    
-    
+
+////////////////////// Consultar documento contabilidad por identificacion //////////////////////
+
+function consultarDocumentoContabilidad(){
+    var selectConsultarDocContabilidad = 'consultarDocumentoContabilidad';
+    viewGeneralDocumentosContables(selectConsultarDocContabilidad);
 }
 
-////////////////////// Consultar documento compra por identificacion //////////////////////
-
-function consultarDocumentoCompra(){
-    var selectConsultarDocCompras = 'consultarDocumentoCompra';
-    viewGeneralDocumentosCompra(selectConsultarDocCompras);
-}
-
-function guardarSeleccionDocumentoCompra(seleccion) {
+function guardarSeleccionDocumentoContabilidad(seleccion) {
     var seleccionDocumentoCompra = JSON.stringify(seleccion);
-    PropertiesService.getDocumentProperties().setProperty('seleccionDocumentoCompra', seleccionDocumentoCompra);
+    PropertiesService.getDocumentProperties().setProperty('seleccionDocumentoContabilidad', seleccionDocumentoCompra);
 }
 
-function mostrarDatosConsultaDocumentoCompra() {
-    var datosString = PropertiesService.getDocumentProperties().getProperty('seleccionDocumentoCompra');
+function mostrarDatosConsultaDocumentoContabilidad() {
+    var datosString = PropertiesService.getDocumentProperties().getProperty('seleccionDocumentoContabilidad');
     var datos = JSON.parse(datosString);
     Logger.log(datos);
 
@@ -887,7 +779,7 @@ function mostrarDatosConsultaDocumentoCompra() {
 
     if(idDocumento && tipoDocumento) {
         var claveAPI = almacenamientoClave();
-        var apiUrl = 'https://api.worldoffice.cloud/api/v1/compra/listarDocumentoCompra'
+        var apiUrl = 'https://api.worldoffice.cloud/api/v1/contabilidad/listarDocContable'
 
         var payloadFV = {
             "columnaOrdenar": "fecha,id",
@@ -951,9 +843,8 @@ function mostrarDatosConsultaDocumentoCompra() {
                 "prefijo": "Prefijo",
                 "numero": "Número",
                 "empresa": "Empresa",
-                "terceroExterno": "Proveedor",
-                "terceroInterno": "Comprador",
-                "formaPago": "Forma de Pago",
+                "terceroExterno": tipoDocumento == 'CE' ? "Beneficiario" : "Recibido de",
+                "terceroInterno": tipoDocumento == 'NC' ? "Tercero" : "Elaborado por",
                 "concepto": "Concepto",
             };
 
@@ -989,38 +880,38 @@ function mostrarDatosConsultaDocumentoCompra() {
                     j++;
                 }
             }
-            PropertiesService.getDocumentProperties().setProperty('seleccionDocumentoCompra', '');
+            PropertiesService.getDocumentProperties().setProperty('seleccionDocumentoContabilidad', '');
         }else {
-            PropertiesService.getDocumentProperties().setProperty('seleccionDocumentoCompra', '');
+            PropertiesService.getDocumentProperties().setProperty('seleccionDocumentoContabilidad', '');
             var errorResponse = response.getResponseCode();
             Logger.log("Error response: " + errorResponse);
 
-            mapeoErrores(errorResponse);
+            mapeoErroresDocumentoContabilidad(errorResponse);
         }
 
     }
 
-    PropertiesService.getDocumentProperties().setProperty('seleccionDocumentoCompra', '');
+    PropertiesService.getDocumentProperties().setProperty('seleccionDocumentoContabilidad', '');
 
 }
 
 ////////////////////// Llamado de vistas general //////////////////////
 
-function viewGeneralDocumentosCompra(select){
-    if(select == 'listarDocCompras'){
-        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/documentos/documento-listado-compras.html').getContent();
+function viewGeneralDocumentosContables(select){
+    if(select == 'listarDocContabilidad'){
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/documentos/documento-listado-contabilidad.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
         .setWidth(750)
         .setHeight(490);
-        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Listar Documentos de Compra');
-    }else if(select == 'consultarDocumentoCompra'){
-        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/documentos/documento-consulta-compras.html').getContent();
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Listar Documentos de Contabilidad');
+    }else if(select == 'consultarDocumentoContabilidad'){
+        var htmlOutputView = HtmlService.createHtmlOutputFromFile('views/documentos/documento-consulta-contabilidad.html').getContent();
         var htmlOutputStyle = HtmlService.createHtmlOutputFromFile('styles/style.html').getContent();
         var htmlOutputComplete = HtmlService.createHtmlOutput(htmlOutputView + htmlOutputStyle)
-        .setWidth(720)
+        .setWidth(750)
         .setHeight(490);
-        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Consultar Documentos de Compra');
+        SpreadsheetApp.getUi().showModalDialog(htmlOutputComplete, 'Consultar Documentos de Contabilidad');
     }
 }
 

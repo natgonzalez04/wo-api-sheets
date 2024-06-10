@@ -84,17 +84,23 @@ function activarOpciones(){
     .addItem('Consultar documentos de ventas', 'consultarDocumentoVenta')
     .addItem('Listar documentos de compra', 'listarDocumentosCompra')
     .addItem('Consultar documento de compra', 'consultarDocumentoCompra')
+    .addItem('Listar documentos contabilidad', 'listarDocumentosContabilidad')
+    .addItem('Consultar documentos contabilidad', 'consultarDocumentoContabilidad')
     .addItem('Enviar documentos por Email', 'consultarEnvioEmailDocumento');
 
     var Inventarios = ui.createMenu('Inventarios')
-    .addItem('Consultar todos los inventarios', 'inventariosListar')
-    .addItem('Consultar bodegas', 'bodegasListar');
+    // .addItem('Consultar todos los inventarios', 'inventariosListar')
+    .addItem('Consultar inventario', 'consultarInventarios')
+    .addItem('Listar clasificación inventario', 'listarClasificacionInventarios')
+    .addItem('Listar bodegas inventario', 'listarBodegasInventarios')
+    .addItem('Listar grupos inventario', 'listarGruposInventarios')
+    .addItem('Listar impuestos venta inventario', 'listarImpuestosVentaInventarios')
 
     var CuentasContables = ui.createMenu('Cuentas Contables')
-    .addItem('Listar cuentas contables', 'listarCuentasContables');
+    .addItem('Listar cuentas contables', 'listarCuentasContables')
+    .addItem('Consultar cuenta contable', 'consultarCuentasContables')
 
     var Contabilidad = ui.createMenu('Contabilidad')
-    .addItem('Consultar documentos contabilidad', 'consultarDocumentoContabilidad')
     .addItem('Formas de pago', 'listarFormasPagoContabilidad');
 
     var menu = ui.createMenu('World Office');

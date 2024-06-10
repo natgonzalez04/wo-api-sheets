@@ -10,13 +10,13 @@
 
             <section class="containerCatalogoBase">
                 <section class="titleCatalogo">
-                    <span>Selecciona una o mas cuentas contables</span>
+                    <span>Selecciona una o mas cuentas contables por numero o tipo</span>
                 </section>
 
                 <section class="containerFiltros">
                         <div class="optFiltro">
-                            <label for="numeroCuenta">Cuenta:
-                                <input type="number" name="numeroCuenta" id="numeroCuenta" min="0" placeholder=" # Cuenta">
+                            <label for="numeroCuenta">Código:
+                                <input type="number" name="numeroCuenta" id="numeroCuenta" min="0" placeholder="Codigo">
                             </label>
                         </div>
                         <div class="optFiltro" style="margin-right: -15px">
@@ -64,6 +64,9 @@
                             </div>
                         </form>
                     </section>
+                    <div class="mensajeErrorSinConsulta">
+                        <span>Por favor, selecciona al menos una cuenta contable</span>
+                    </div>
                     <button type="button" class="buttonImport" onclick="sendDataSelected()">Agregar</button>
                 </section>
             </section>
@@ -89,11 +92,14 @@
                     var optionsExit = document.getElementsByName('option');
                     var optionChecked = document.querySelector('input[name="option"]:checked');
                     var contenedorGlobal = document.querySelector('.containerCatalogoBase');
+                    var contenedorLoading = document.querySelector('.loading');
                     var containerBase = document.querySelector('.containerCatalogo');
                     var numeroCuenta = document.getElementById('numeroCuenta');
                     var selectNaturalezaCuenta = document.getElementById('naturalezaCuenta');
                     var containerAllSeleccion = document.querySelector('.optionAll');
+                    var mensajeErrorSinConsulta = document.querySelector('.mensajeErrorSinConsulta');
                     var optionData = document.querySelector('.optionsData');
+                    var btnConsulta = document.getElementById('contenedorButtonConsulta');
                     var mensajeErrorInicial = document.querySelector('.mensajeErrorInicial');
                     var selectOptionSend;
                     var selecciones = [];
@@ -133,8 +139,9 @@
                     containerAllSeleccion.style.display = 'none';
                     mensajeErrorInicial.style.display = 'none';
                     containerBase.style.display = 'none';
+                    contenedorLoading.style.display = 'none';
                     optionData.style.display = 'none';
-                    document.getElementById('loading').remove();
+
 
                     var optionSelecciona = document.createElement('option');
                         optionSelecciona.value = "";
@@ -150,72 +157,21 @@
                         selectNaturalezaCuenta.appendChild(option);
                     }
 
-
-                    // google.script.run.withSuccessHandler(function(result) {
-                            
-                    //     resulAll = result;
-                    //     result.forEach(function(elemento) {
-                    //     var fila = document.createElement('tr');
-                    //     var celda = document.createElement('td');
-                    //     celda.textContent = `${elemento.codigo} ${' '} ${elemento.nombre}`;
-                    //     celda.classList.add('celdaTabla');
-                    //     fila.appendChild(celda);
-                    //     fila.classList.add('filaTabla');
-                    //     fila.addEventListener('click', clickCell);
-                    //     tabla.appendChild(fila);
-
-                    // });
-                    //     contenedorGlobal.style.display = 'flex';
-                    //     document.getElementById('loading').remove();
-
-                    //     selectNaturalezaCuenta.innerHTML = '';
-
-                    //     var optionSelecciona = document.createElement('option');
-                    //     optionSelecciona.value = "";
-                    //     optionSelecciona.text = "Selecciona";
-                    //     optionSelecciona.disabled = true;
-                    //     optionSelecciona.selected = true;
-                    //     selectNaturalezaCuenta.insertBefore(optionSelecciona, selectNaturalezaCuenta.firstChild);
-
-                    //     var optionTodos = document.createElement('option');
-                    //     optionTodos.value = "todos";
-                    //     optionTodos.text = "Todos";
-                    //     selectNaturalezaCuenta.insertBefore(optionTodos, selectNaturalezaCuenta.children[1]);
-
-                    //     var addedValues = {};
-                    //     for (var i = 0; i < resulAll.length; i++) {
-                    //         if (!addedValues[resulAll[i].cuentaContableTipo.cuentaContableNaturaleza]) {
-                    //         var optionNaturaleza = document.createElement('option');
-                    //         optionNaturaleza.value = resulAll[i].cuentaContableTipo.id; 
-                    //         optionNaturaleza.text = resulAll[i].cuentaContableTipo.cuentaContableNaturaleza; 
-                    //         selectNaturalezaCuenta.appendChild(optionNaturaleza);
-                    //         addedValues[resulAll[i].cuentaContableTipo.cuentaContableNaturaleza] = true;
-                    //         }
-                    //     }
-
-                    // }).getDataCuentaContable();
-                    
-                    // selectNaturalezaCuenta.addEventListener('change', function() {
-                    //     resulAll = [];
-                    //     numeroCuenta.value = null;
-                    //     containerAllSeleccion.style.display = 'none';
-                    //     containerBase.style.display = 'none';
-                    //     optionData.style.display = 'none';
-
-                    // });
-
                     selectNaturalezaCuenta.addEventListener('change', function() {
-                        // Este código se ejecutará cada vez que el valor del select cambie
-                        console.log('El valor del select ha cambiado a: ' + this.value);
-
-
                         numeroCuenta.value = null;
                         containerAllSeleccion.style.display = 'none';
                         containerBase.style.display = 'none';
                         optionData.style.display = 'none';
+                        btnConsulta.style.display = 'flex';
 
-                        google.script.run.deletePropertyCuentaContable();
+                    });
 
+                    numeroCuenta.addEventListener('input', function(e) {
+                        if(e.target.value){
+                            selectNaturalezaCuenta.disabled = true;
+                        }else{
+                            selectNaturalezaCuenta.disabled = false;
+                        }
                     });
 
                     function guardarValidacionInicial(){
@@ -249,14 +205,16 @@
                                 google.script.run.withSuccessHandler(function(result) {
                                     console.log(result);
                                     if(result.length > 0){
-                                        resulAll = [];
+
                                         mensajeErrorInicial.style.display = 'none';
                                         containerBase.style.display = 'flex';
                                         containerAllSeleccion.style.display = 'flex';
                                         optionData.style.display = 'block';
-
+                                        tabla.innerHTML = '';
                                         resulAll = result;
-                                        resulAll.forEach(function(elemento) {
+
+                                        result.forEach(function(elemento) {
+                                            btnConsulta.style.display = 'none';
                                             var fila = document.createElement('tr');
                                             var celda = document.createElement('td');
                                             celda.textContent = `${elemento.codigo} ${' '} ${elemento.nombre}`;
@@ -333,17 +291,31 @@
                             evento.target.classList.remove('selectedCelda');
                         } else {
                             selecciones.push(seleccionArray);
+                            mensajeErrorSinConsulta.style.display = 'none';
                             evento.target.classList.add('selectedCelda');
                         }
-
+                        console.log(selecciones,'selecciones');
                         google.script.run.guardarSeleccionCuentaContable(selecciones);
                     }
 
                     function sendDataSelected() {
-                        google.script.run.mostrarDatosCeldaCuentaContable();
-                        google.script.host.close();
+                        if(selecciones.length === 0) {
+                            mensajeErrorSinConsulta.style.display = 'flex';
+                        }else{
+                            contenedorGlobal.style.display = 'none';
+                            contenedorLoading.style.display = 'flex';
+
+                            google.script.run.withSuccessHandler(function(result) {
+                                google.script.host.close();
+                            }).withFailureHandler(function(error) {
+                                google.script.host.close();
+                            }).mostrarDatosCeldaCuentaContable();
+                        }
+                        
                     }
 
             </script>
     </body>
 </html>
+
+
