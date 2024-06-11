@@ -443,7 +443,7 @@ function cuentasContablesCodigo(codigo, validacion){
                 var j = 0;
                 for (var key in keys) {
                     var headerCell = celdaActiva.offset(0, j);
-                    headerCell.setValue(keys[key]);
+                    headerCell.setValue(keys[key]); 
                     j++;
                 }
             }
