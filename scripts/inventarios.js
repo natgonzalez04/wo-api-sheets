@@ -556,8 +556,7 @@ function mostrarDatosImpuestosVentaInventarios(){
 
             var keys = {
                 "id": "Id",
-                "nombre": "Nombre",
-                "ubicacionPais": "País",
+                "nombre": "Nombre", 
                 "tipo": "Tipo"
             };
 
@@ -576,8 +575,6 @@ function mostrarDatosImpuestosVentaInventarios(){
 
                     if(key == 'id'){
                         cell.setValue(String(content[i][key]));
-                    }else if(key == 'ubicacionPais'){
-                        cell.setValue(content[i]['ubicacionPais'].nombre);
                     }else{
                         cell.setValue(content[i][key]); 
                     }

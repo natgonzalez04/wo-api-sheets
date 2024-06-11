@@ -226,8 +226,7 @@ function mostrarDatosCeldaCuentaContable() {
                 "cuentaContableGrupo":"Grupo",
                 "senManejaCentroCosto": "Centro Costo",
                 "senActivo": "Estado",
-                "senVisible": "Visible",
-                "senAjustePorInflacion":"Ajuste Por Inflación"
+                "senVisible": "Visible"
             };
 
             var j = 0;
@@ -253,7 +252,7 @@ function mostrarDatosCeldaCuentaContable() {
                         }else{
                             cell.setValue('Inactivo');
                         }
-                    }else if(key == 'senVisible' || key == 'senAjustePorInflacion' || key == 'senManejaCentroCosto'){
+                    }else if(key == 'senVisible' || key == 'senManejaCentroCosto'){
                         if(dataCuentaContableFiltrada[i][key] == true){
                             cell.setValue('Si');
                         }else{
@@ -342,8 +341,7 @@ function cuentasContablesId(id, validacion){
                 "cuentaContableGrupo":"Grupo",
                 "senManejaCentroCosto": "Centro Costo",
                 "senActivo": "Estado",
-                "senVisible": "Visible",
-                "senAjustePorInflacion":"Ajuste Por Inflación"
+                "senVisible": "Visible"
             };
 
 
@@ -377,7 +375,7 @@ function cuentasContablesId(id, validacion){
                         }else{
                             cell.setValue('Inactivo');
                         }
-                    }else if(key == 'senVisible' || key == 'senAjustePorInflacion' || key == 'senManejaCentroCosto'){
+                    }else if(key == 'senVisible' || key == 'senManejaCentroCosto'){
                         if(content[i][key] == true){
                             cell.setValue('Si');
                         }else{
@@ -437,8 +435,7 @@ function cuentasContablesCodigo(codigo, validacion){
                 "cuentaContableGrupo":"Grupo",
                 "senManejaCentroCosto": "Centro Costo",
                 "senActivo": "Estado",
-                "senVisible": "Visible",
-                "senAjustePorInflacion":"Ajuste Por Inflación"
+                "senVisible": "Visible"
             };
 
 
@@ -472,7 +469,7 @@ function cuentasContablesCodigo(codigo, validacion){
                         }else{
                             cell.setValue('Inactivo');
                         }
-                    }else if(key == 'senVisible' || key == 'senAjustePorInflacion' || key == 'senManejaCentroCosto'){
+                    }else if(key == 'senVisible' || key == 'senManejaCentroCosto'){
                         if(content[i][key] == true){
                             cell.setValue('Si');
                         }else{
