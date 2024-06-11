@@ -1,4 +1,4 @@
-var ui = SpreadsheetApp.getUi();
+var ui = SpreadsheetApp.getUi(); 
 
 
 function onOpen(){
@@ -7,7 +7,7 @@ function onOpen(){
   .addToUi();
 }
 
-function mostrarPaginaPrincipal() {
+function mostrarPaginaPrincipal() { 
     var htmlOutput = HtmlService.createHtmlOutputFromFile('views/login.html')
         .setWidth(420)
         .setHeight(370);
