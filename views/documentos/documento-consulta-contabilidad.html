@@ -84,6 +84,7 @@
 
                     var contenedorGlobal = document.querySelector('.containerCatalogoBase');
                     var contenedorLoading = document.querySelector('.loading');
+                    var checkboxEncabezados = true;
                     var statusCheck;
                     contenedorGlobal.style.display = 'flex';
 
@@ -121,13 +122,14 @@
                     var seccion = document.querySelector('.containerEjemplo');
                     seccion.appendChild(tabla);
 
+                    document.getElementById('addEncabezado').addEventListener('change', function(e) {
+                        checkboxEncabezados = e.target.checked;
+                    });
+
                     function guardarSeleccion() {
                         var selectDocument = document.getElementById("tipoDocumento");
                         var idDocumento = document.getElementById('idDocumento');
                         var mensajeError = document.querySelector('.mensajeErrorConsulta');
-                        var checkboxEncabezados = document.getElementById('addEncabezado').checked;
-
-                        checkboxEncabezados.onchange = guardarSeleccion;
                         
                         if(idDocumento.value && selectDocument.value) {
                             mensajeError.style.display = 'none';
@@ -147,7 +149,7 @@
 
                     }
                     
-                    
+                    checkboxEncabezados.onchange = guardarSeleccion;
                     idDocumento.onchange = guardarSeleccion;
                     
 

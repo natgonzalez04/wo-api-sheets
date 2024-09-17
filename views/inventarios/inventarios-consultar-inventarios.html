@@ -79,6 +79,7 @@
 
                     var contenedorGlobal = document.querySelector('.containerCatalogoBase');
                     var contenedorLoading = document.querySelector('.loading');
+                    var checkboxEncabezados = true;
                     var statusCheck;
                     contenedorGlobal.style.display = 'flex';
 
@@ -116,15 +117,20 @@
                     var seccion = document.querySelector('.containerEjemplo');
                     seccion.appendChild(tabla);
 
+                    document.getElementById('addEncabezado').addEventListener('change', function(e) {
+                        checkboxEncabezados = e.target.checked;
+                    });
+
                     function guardarSeleccion() {
                         var identificacion = document.getElementById('identificacion');
                         var idInventario = document.getElementById('idInventario');
                         var mensajeError = document.querySelector('.mensajeErrorConsulta');
-                        var checkboxEncabezados = document.getElementById('addEncabezado').checked;
+
 
 
                         
                         if(identificacion.value || idInventario.value) {
+
                             mensajeError.style.display = 'none';
                             var seleccionTercero = {
                                 codigoInventario: identificacion.value,
@@ -156,7 +162,8 @@
                             google.script.run.withSuccessHandler(function(result) {
                                 google.script.host.close();
                             }).withFailureHandler(function(error) {
-                                google.script.host.close();
+                                // google.script.host.close();
+                                console.log(error);
                             }).mostrarDatosConsultaInventarios();
                         }
                     

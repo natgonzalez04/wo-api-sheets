@@ -79,6 +79,7 @@
 
                     var contenedorGlobal = document.querySelector('.containerCatalogoBase');
                     var contenedorLoading = document.querySelector('.loading');
+                    var checkboxEncabezados = true;
                     var statusCheck;
                     contenedorGlobal.style.display = 'flex';
 
@@ -116,13 +117,14 @@
                     var seccion = document.querySelector('.containerEjemplo');
                     seccion.appendChild(tabla);
 
+                    document.getElementById('addEncabezado').addEventListener('change', function(e) {
+                        checkboxEncabezados = e.target.checked;
+                    });
+
                     function guardarSeleccion() {
                         var identificacion = document.getElementById('identificacion');
                         var idTercero = document.getElementById('idTercero');
                         var mensajeError = document.querySelector('.mensajeErrorConsulta');
-                        var checkboxEncabezados = document.getElementById('addEncabezado').checked;
-
-                        checkboxEncabezados.onchange = guardarSeleccion;
                         
                         if(identificacion.value || idTercero.value) {
                             mensajeError.style.display = 'none';
@@ -145,6 +147,7 @@
                     
                     identificacion.onchange = guardarSeleccion;
                     idTercero.onchange = guardarSeleccion;
+                    checkboxEncabezados.onchange = guardarSeleccion;
                     
 
                     function sendDataSelected() {

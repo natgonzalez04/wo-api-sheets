@@ -1,9 +1,9 @@
-var ui = SpreadsheetApp.getUi(); 
+// var ui = SpreadsheetApp.getUi(); 
 
 
 function onOpen(){
-  ui.createMenu('World Office')
-  .addItem('Configuración', 'mostrarPaginaPrincipal')
+  SpreadsheetApp.getUi().createMenu('World Office')
+  .addItem('Inicializar', 'mostrarPaginaPrincipal')
   .addToUi();
 }
 
@@ -43,10 +43,10 @@ function validacionClaveAPI() {
     Logger.log(response);
     if (response == 'true'){
       activarOpciones();
-      ui.alert('Tu token API ha sido confirmado con exito.');
+      SpreadsheetApp.getUi().alert('Tu token API ha sido confirmado con exito.');
       return Boolean(claveAPI);
     }else {
-      ui.alert('Tu token API esta inactivo y/o no ha sido configurado.');
+      SpreadsheetApp.getUi().alert('Tu token API esta inactivo y/o no ha sido configurado.');
       return Boolean(claveAPI);
     }
 
@@ -103,6 +103,20 @@ function activarOpciones(){
     var Contabilidad = ui.createMenu('Contabilidad')
     .addItem('Formas de pago', 'listarFormasPagoContabilidad');
 
+    var FuncionesPersonalizadas = ui.createMenu('Funciones Personalizadas')
+    .addItem('Saldo cuentas', 'abrirSaldoCuenta')
+    .addItem('Saldo cuentas x cobrar y pagar', 'abrirSaldoCuentasPagarCobrar')
+    .addItem('Movimientos', 'abrirMovimientos')
+    .addItem('Movimientos x tercero', 'abrirMovimientosTercero')
+    .addItem('Movimientos presupuesto', 'abrirMovimientosPresupuesto')
+    .addItem('Ventas producto', 'abrirVentasProducto')
+    .addItem('Cantidades Ventas producto', 'abrirCantidadesVentasProducto')
+    .addItem('Existencias producto', 'abrirExistenciasProducto')
+    .addItem('Precio venta producto', 'abrirPrecioVentaProducto')
+    .addItem('Costo promedio producto', 'abrirCostoPromedioProducto')
+    .addItem('Valor numerico a letras (español - ingles)', 'abrirConvertirValorNumerico')
+    .addItem('Información por campo', 'abrirInformacionCampo');
+
     var menu = ui.createMenu('World Office');
     menu.addItem('Ver Token', 'mostrarClaveAPI')
     menu.addItem('Cerrar Sesión', 'cerrarSesion')
@@ -113,23 +127,14 @@ function activarOpciones(){
     .addSubMenu(Inventarios)
     .addSubMenu(CuentasContables)
     .addSubMenu(Contabilidad)
+    .addSubMenu(FuncionesPersonalizadas)
     .addToUi();
 }
 
 function mostrarClaveAPI(){
     var claveAPI = PropertiesService.getUserProperties().getProperty('claveAPI');
     var claveAPIFormateada = claveAPI.match(/.{1,50}/g).join("\n");
-    ui.alert('Tu token API en uso es: \n\n' + claveAPIFormateada);
-}
-
-////////////////////// funciones de documentos //////////////////////
-
-function inventariosListar(){
-
-}
-
-function bodegasListar(){
-
+    SpreadsheetApp.getUi().alert('Tu token API en uso es: \n\n' + claveAPIFormateada);
 }
 
 function cerrarSesion(){

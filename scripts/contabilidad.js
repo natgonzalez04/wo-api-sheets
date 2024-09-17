@@ -1,6 +1,6 @@
 ////////////////////// Funciones documentos contabilidad //////////////////////
 
-var ui = SpreadsheetApp.getUi();
+// var  = SpreadsheetApp.getUi();
 
 var payload = {
     "columnaOrdenar": "id",

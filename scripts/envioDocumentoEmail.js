@@ -1,6 +1,6 @@
 ////////////////////// Funciones iniciales //////////////////////
 
-var ui = SpreadsheetApp.getUi();
+// var ui = SpreadsheetApp.getUi();
 
 var payload = {
     "columnaOrdenar": "id",
